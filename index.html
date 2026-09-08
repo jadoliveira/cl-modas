@@ -1,0 +1,1588 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CL MODAS — Estilo que impõe confiança que fica.</title>
+<meta name="description" content="CL MODAS — loja de moda masculina em Campo Maior-PI. Camisas, calças, moletons, perfumes e acessórios." />
+<link rel="icon" href="data:," />
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Manrope:wght@400;500;600;700;800&display=swap" />
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<style>
+  html, body { margin: 0; padding: 0; background: #131110; }
+  * { box-sizing: border-box; }
+  button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, a:focus-visible { outline: 2px solid #B08D3E; outline-offset: 2px; }
+  input[type="range"] { accent-color: #B08D3E; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideRight { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+  @keyframes modalIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes toastIn { from { opacity: 0; transform: translate(-50%, 10px); } to { opacity: 1; transform: translate(-50%, 0); } }
+  .animate-fadeIn { animation: fadeIn 0.35s ease; }
+  .animate-slideRight { animation: slideRight 0.25s ease; }
+  .animate-modalIn { animation: modalIn 0.2s ease; }
+  .animate-toastIn { animation: toastIn 0.25s ease; }
+  @media (prefers-reduced-motion: reduce) { .animate-fadeIn, .animate-slideRight, .animate-modalIn, .animate-toastIn { animation: none !important; } }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+  // Camada de armazenamento local (substitui o window.storage do ambiente Claude
+  // por um equivalente baseado em localStorage, para este arquivo funcionar
+  // sozinho em qualquer hospedagem).
+  (function () {
+    function fullKey(key, shared) { return "clmodas:" + (shared ? "shared" : "local") + ":" + key; }
+    window.storage = {
+      async get(key, shared) {
+        const raw = localStorage.getItem(fullKey(key, shared));
+        if (raw === null) return null;
+        return { key, value: raw, shared: !!shared };
+      },
+      async set(key, value, shared) {
+        localStorage.setItem(fullKey(key, shared), value);
+        return { key, value, shared: !!shared };
+      },
+      async delete(key, shared) {
+        localStorage.removeItem(fullKey(key, shared));
+        return { key, deleted: true, shared: !!shared };
+      },
+      async list(prefix, shared) {
+        const p = "clmodas:" + (shared ? "shared" : "local") + ":" + (prefix || "");
+        const keys = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (k && k.indexOf(p) === 0) keys.push(k.slice(("clmodas:" + (shared ? "shared" : "local") + ":").length));
+        }
+        return { keys, prefix, shared: !!shared };
+      },
+    };
+  })();
+</script>
+
+<script>
+(() => {
+  const { useState, useEffect, useMemo, useRef } = React;
+  function IconBase({ size = 20, color = "currentColor", fill = "none", strokeWidth = 2, viewBox = "0 0 24 24", style, className, children }) {
+    return /* @__PURE__ */ React.createElement(
+      "svg",
+      {
+        width: size,
+        height: size,
+        viewBox,
+        fill,
+        stroke: color,
+        strokeWidth,
+        strokeLinecap: "round",
+        strokeLinejoin: "round",
+        style,
+        className
+      },
+      children
+    );
+  }
+  function Search(p) {
+    return /* @__PURE__ */ React.createElement(IconBase, { ...p }, /* @__PURE__ */ React.createElement("circle", { cx: "11", cy: "11", r: "7" }), /* @__PURE__ */ React.createElement("line", { x1: "21", y1: "21", x2: "16.65", y2: "16.65" }));
+  }
+  function Heart(p) {
+    return /* @__PURE__ */ React.createElement(IconBase, { ...p }, /* @__PURE__ */ React.createElement("path", { d: "M12 21c-4.6-3-9-6.4-9-11a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 4.6-4.4 8-9 11z" }));
+  }
+  function ShoppingBag(p) {
+    return /* @__PURE__ */ React.createElement(IconBase, { ...p }, /* @__PURE__ */ React.createElement("path", { d: "M6 8V6a6 6 0 0 1 12 0v2" }), /* @__PURE__ */ React.createElement("rect", { x: "3", y: "8", width: "18", height: "13", rx: "2" }));
+  }
+  function Menu(p) {
+    return /* @__PURE__ */ React.createElement(IconBase, { ...p }, /* @__PURE__ */ React.createElement("line", { x1: "3", y1: "6", x2: "21", y2: "6" }), /* @__PURE__ */ React.createElement("line", { x1: "3", y1: "12", x2: "21", y2: "12" }), /* @__PURE__ */ React.createElement("line", { x1: "3", y1: "18", x2: "21", y2: "18" }));
+  }
+  function X(p) {
+    return /* @__PURE__ */ React.createElement(IconBase, { ...p }, /* @__PURE__ */ React.createElement("line", { x1: "18", y1: "6", x2: "6", y2: "18" }), /* @__PURE__ */ React.createElement("line", { x1: "6", y1: "6", x2: "18", y2: "18" }));
+  }
+  function Plus(p) {
+    return /* @__PURE__ */ React.createElement(IconBase, { ...p }, /* @__PURE__ */ React.createElement("line", { x1: "12", y1: "5", x2: "12", y2: "19" }), /* @__PURE__ */ React.createElement("line", { x1: "5", y1: "12", x2: "19", y2: "12" }));
+  }
+  function Minus(p) {
+    return /* @__PURE__ */ React.createElement(IconBase, { ...p }, /* @__PURE__ */ React.createElement("line", { x1: "5", y1: "12", x2: "19", y2: "12" }));
+  }
+  function Trash2(p) {
+    return /* @__PURE__ */ React.createElement(IconBase, { ...p }, /* @__PURE__ */ React.createElement("polyline", { points: "3 6 5 6 21 6" }), /* @__PURE__ */ React.createElement("path", { d: "M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" }), /* @__PURE__ */ React.createElement("line", { x1: "10", y1: "11", x2: "10", y2: "17" }), /* @__PURE__ */ React.createElement("line", { x1: "14", y1: "11", x2: "14", y2: "17" }), /* @__PURE__ */ React.createElement("path", { d: "M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" }));
+  }
+  function Pencil(p) {
+    return /* @__PURE__ */ React.createElement(IconBase, { ...p }, /* @__PURE__ */ React.createElement("path", { d: "M12 20h9" }), /* @__PURE__ */ React.createElement("path", { d: "M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" }));
+  }
+  function Copy(p) {
+    return /* @__PURE__ */ React.createElement(IconBase, { ...p }, /* @__PURE__ */ React.createElement("rect", { x: "9", y: "9", width: "13", height: "13", rx: "2" }), /* @__PURE__ */ React.createElement("path", { d: "M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" }));
+  }
+  function LogOut(p) {
+    return /* @__PURE__ */ React.createElement(IconBase, { ...p }, /* @__PURE__ */ React.createElement("path", { d: "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" }), /* @__PURE__ */ React.createElement("polyline", { points: "16 17 21 12 16 7" }), /* @__PURE__ */ React.createElement("line", { x1: "21", y1: "12", x2: "9", y2: "12" }));
+  }
+  function LayoutDashboard(p) {
+    return /* @__PURE__ */ React.createElement(IconBase, { ...p }, /* @__PURE__ */ React.createElement("rect", { x: "3", y: "3", width: "7", height: "9" }), /* @__PURE__ */ React.createElement("rect", { x: "14", y: "3", width: "7", height: "5" }), /* @__PURE__ */ React.createElement("rect", { x: "14", y: "12", width: "7", height: "9" }), /* @__PURE__ */ React.createElement("rect", { x: "3", y: "16", width: "7", height: "5" }));
+  }
+  function Package(p) {
+    return /* @__PURE__ */ React.createElement(IconBase, { ...p }, /* @__PURE__ */ React.createElement("rect", { x: "3", y: "8", width: "18", height: "13", rx: "1" }), /* @__PURE__ */ React.createElement("path", { d: "M3 8l9-5 9 5" }), /* @__PURE__ */ React.createElement("line", { x1: "12", y1: "8", x2: "12", y2: "21" }));
+  }
+  function Tag(p) {
+    return /* @__PURE__ */ React.createElement(IconBase, { ...p }, /* @__PURE__ */ React.createElement("path", { d: "M12 2H4a2 2 0 0 0-2 2v8l10 10 10-10-10-10z" }), /* @__PURE__ */ React.createElement("circle", { cx: "8", cy: "8", r: "1.5" }));
+  }
+  function Ticket(p) {
+    return /* @__PURE__ */ React.createElement(IconBase, { ...p }, /* @__PURE__ */ React.createElement("path", { d: "M3 9a2 2 0 0 0 0 4v2a2 2 0 0 0 0 4h18a2 2 0 0 0 0-4v-2a2 2 0 0 0 0-4H3z" }), /* @__PURE__ */ React.createElement("line", { x1: "9", y1: "9", x2: "9", y2: "19", strokeDasharray: "2 2" }));
+  }
+  function ImageIcon(p) {
+    return /* @__PURE__ */ React.createElement(IconBase, { ...p }, /* @__PURE__ */ React.createElement("rect", { x: "3", y: "3", width: "18", height: "18", rx: "2" }), /* @__PURE__ */ React.createElement("circle", { cx: "8.5", cy: "8.5", r: "1.5" }), /* @__PURE__ */ React.createElement("path", { d: "M21 15l-5-5L5 21" }));
+  }
+  function SettingsIcon(p) {
+    return /* @__PURE__ */ React.createElement(IconBase, { ...p }, /* @__PURE__ */ React.createElement("circle", { cx: "12", cy: "12", r: "3" }), /* @__PURE__ */ React.createElement("line", { x1: "12", y1: "1", x2: "12", y2: "5" }), /* @__PURE__ */ React.createElement("line", { x1: "12", y1: "19", x2: "12", y2: "23" }), /* @__PURE__ */ React.createElement("line", { x1: "4.2", y1: "4.2", x2: "7", y2: "7" }), /* @__PURE__ */ React.createElement("line", { x1: "17", y1: "17", x2: "19.8", y2: "19.8" }), /* @__PURE__ */ React.createElement("line", { x1: "1", y1: "12", x2: "5", y2: "12" }), /* @__PURE__ */ React.createElement("line", { x1: "19", y1: "12", x2: "23", y2: "12" }), /* @__PURE__ */ React.createElement("line", { x1: "4.2", y1: "19.8", x2: "7", y2: "17" }), /* @__PURE__ */ React.createElement("line", { x1: "17", y1: "7", x2: "19.8", y2: "4.2" }));
+  }
+  function MapPin(p) {
+    return /* @__PURE__ */ React.createElement(IconBase, { ...p }, /* @__PURE__ */ React.createElement("path", { d: "M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" }), /* @__PURE__ */ React.createElement("circle", { cx: "12", cy: "10", r: "3" }));
+  }
+  function Instagram(p) {
+    return /* @__PURE__ */ React.createElement(IconBase, { ...p }, /* @__PURE__ */ React.createElement("rect", { x: "2", y: "2", width: "20", height: "20", rx: "5" }), /* @__PURE__ */ React.createElement("circle", { cx: "12", cy: "12", r: "4.5" }), /* @__PURE__ */ React.createElement("circle", { cx: "17.5", cy: "6.5", r: "1" }));
+  }
+  function MessageCircle(p) {
+    return /* @__PURE__ */ React.createElement(IconBase, { ...p }, /* @__PURE__ */ React.createElement("path", { d: "M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" }));
+  }
+  function Check(p) {
+    return /* @__PURE__ */ React.createElement(IconBase, { ...p }, /* @__PURE__ */ React.createElement("polyline", { points: "20 6 9 17 4 12" }));
+  }
+  function AlertCircle(p) {
+    return /* @__PURE__ */ React.createElement(IconBase, { ...p }, /* @__PURE__ */ React.createElement("circle", { cx: "12", cy: "12", r: "10" }), /* @__PURE__ */ React.createElement("line", { x1: "12", y1: "8", x2: "12", y2: "12" }), /* @__PURE__ */ React.createElement("line", { x1: "12", y1: "16", x2: "12.01", y2: "16" }));
+  }
+  function SlidersHorizontal(p) {
+    return /* @__PURE__ */ React.createElement(IconBase, { ...p }, /* @__PURE__ */ React.createElement("line", { x1: "4", y1: "6", x2: "20", y2: "6" }), /* @__PURE__ */ React.createElement("circle", { cx: "9", cy: "6", r: "2" }), /* @__PURE__ */ React.createElement("line", { x1: "4", y1: "12", x2: "20", y2: "12" }), /* @__PURE__ */ React.createElement("circle", { cx: "15", cy: "12", r: "2" }), /* @__PURE__ */ React.createElement("line", { x1: "4", y1: "18", x2: "20", y2: "18" }), /* @__PURE__ */ React.createElement("circle", { cx: "7", cy: "18", r: "2" }));
+  }
+  function Crown(p) {
+    return /* @__PURE__ */ React.createElement(IconBase, { ...p }, /* @__PURE__ */ React.createElement("path", { d: "M3 18h18l-1-9-5 4-3-7-3 7-5-4-1 9z" }));
+  }
+  function Star(p) {
+    return /* @__PURE__ */ React.createElement(IconBase, { ...p }, /* @__PURE__ */ React.createElement("polygon", { points: "12 2 15 9 22 9.5 17 14.5 18.5 21.5 12 17.5 5.5 21.5 7 14.5 2 9.5 9 9" }));
+  }
+  function ArrowLeft(p) {
+    return /* @__PURE__ */ React.createElement(IconBase, { ...p }, /* @__PURE__ */ React.createElement("line", { x1: "19", y1: "12", x2: "5", y2: "12" }), /* @__PURE__ */ React.createElement("polyline", { points: "12 19 5 12 12 5" }));
+  }
+  function ExternalLink(p) {
+    return /* @__PURE__ */ React.createElement(IconBase, { ...p }, /* @__PURE__ */ React.createElement("path", { d: "M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" }), /* @__PURE__ */ React.createElement("polyline", { points: "15 3 21 3 21 9" }), /* @__PURE__ */ React.createElement("line", { x1: "10", y1: "14", x2: "21", y2: "3" }));
+  }
+  function Upload(p) {
+    return /* @__PURE__ */ React.createElement(IconBase, { ...p }, /* @__PURE__ */ React.createElement("path", { d: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" }), /* @__PURE__ */ React.createElement("polyline", { points: "17 8 12 3 7 8" }), /* @__PURE__ */ React.createElement("line", { x1: "12", y1: "3", x2: "12", y2: "15" }));
+  }
+  function LinkIcon(p) {
+    return /* @__PURE__ */ React.createElement(IconBase, { ...p }, /* @__PURE__ */ React.createElement("path", { d: "M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1 1" }), /* @__PURE__ */ React.createElement("path", { d: "M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1-1" }));
+  }
+  function ClipboardList(p) {
+    return /* @__PURE__ */ React.createElement(IconBase, { ...p }, /* @__PURE__ */ React.createElement("rect", { x: "4", y: "4", width: "16", height: "18", rx: "2" }), /* @__PURE__ */ React.createElement("path", { d: "M9 2h6a1 1 0 0 1 1 1v2H8V3a1 1 0 0 1 1-1z" }), /* @__PURE__ */ React.createElement("line", { x1: "8", y1: "11", x2: "16", y2: "11" }), /* @__PURE__ */ React.createElement("line", { x1: "8", y1: "15", x2: "16", y2: "15" }), /* @__PURE__ */ React.createElement("line", { x1: "8", y1: "19", x2: "13", y2: "19" }));
+  }
+  function LayoutGrid(p) {
+    return /* @__PURE__ */ React.createElement(IconBase, { ...p }, /* @__PURE__ */ React.createElement("rect", { x: "3", y: "3", width: "7", height: "7" }), /* @__PURE__ */ React.createElement("rect", { x: "14", y: "3", width: "7", height: "7" }), /* @__PURE__ */ React.createElement("rect", { x: "14", y: "14", width: "7", height: "7" }), /* @__PURE__ */ React.createElement("rect", { x: "3", y: "14", width: "7", height: "7" }));
+  }
+  function Users(p) {
+    return /* @__PURE__ */ React.createElement(IconBase, { ...p }, /* @__PURE__ */ React.createElement("path", { d: "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" }), /* @__PURE__ */ React.createElement("circle", { cx: "9", cy: "7", r: "4" }), /* @__PURE__ */ React.createElement("path", { d: "M23 21v-2a4 4 0 0 0-3-3.87" }), /* @__PURE__ */ React.createElement("path", { d: "M16 3.13a4 4 0 0 1 0 7.75" }));
+  }
+  function SimpleLineChart({ data, height }) {
+    const w = 600, h = height || 220;
+    const padding = { top: 12, right: 14, bottom: 24, left: 14 };
+    const values = data.map((d) => d.total);
+    const maxV = Math.max(1, ...values);
+    const innerW = w - padding.left - padding.right;
+    const innerH = h - padding.top - padding.bottom;
+    const stepX = data.length > 1 ? innerW / (data.length - 1) : 0;
+    const points = data.map((d, i) => ({
+      x: padding.left + i * stepX,
+      y: padding.top + innerH - d.total / maxV * innerH,
+      ...d
+    }));
+    const pathD = points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(" ");
+    const gridLevels = [0, 0.25, 0.5, 0.75, 1];
+    return /* @__PURE__ */ React.createElement("svg", { width: "100%", height: h, viewBox: `0 0 ${w} ${h}`, preserveAspectRatio: "none" }, gridLevels.map((g, i) => {
+      const y = padding.top + innerH * (1 - g);
+      return /* @__PURE__ */ React.createElement("line", { key: i, x1: padding.left, x2: w - padding.right, y1: y, y2: y, stroke: COLORS.line, strokeDasharray: "3 3" });
+    }), /* @__PURE__ */ React.createElement("path", { d: pathD, fill: "none", stroke: COLORS.gold, strokeWidth: "2" }), points.map((p, i) => /* @__PURE__ */ React.createElement("g", { key: i }, /* @__PURE__ */ React.createElement("circle", { cx: p.x, cy: p.y, r: "3.5", fill: COLORS.gold }), /* @__PURE__ */ React.createElement("text", { x: p.x, y: h - 6, fontSize: "11", fill: "#8A8377", textAnchor: "middle" }, p.day))));
+  }
+  const COLORS = {
+    ink: "#131110",
+    inkSoft: "#1C1915",
+    charcoal: "#242019",
+    charcoalLight: "#2E2921",
+    cream: "#EFE9DC",
+    creamSoft: "#F8F5EE",
+    gold: "#B08D3E",
+    goldLight: "#D8BD79",
+    goldDeep: "#8C6D2C",
+    line: "#3A342C",
+    lineOnCream: "#DFD6C0",
+    red: "#B3462C",
+    green: "#4C7A54"
+  };
+  const WHATSAPP_DIGITS_DEFAULT = "5586994350475";
+  const ADMIN_USER = "admin";
+  const ADMIN_PASS = "clmodas2026";
+  const STATUS_FLOW = ["Novo", "Confirmado", "Em prepara\xE7\xE3o", "Enviado", "Entregue", "Cancelado"];
+  const STATUS_COLORS = {
+    "Novo": "#8C6D2C",
+    "Confirmado": "#3E6B8C",
+    "Em prepara\xE7\xE3o": "#8C6A3E",
+    "Enviado": "#5A5F8C",
+    "Entregue": "#4C7A54",
+    "Cancelado": "#B3462C"
+  };
+  function uid(prefix) {
+    return prefix + "_" + Math.random().toString(36).slice(2, 9);
+  }
+  function brl(n) {
+    return (Number(n) || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  function img(seed, w, h) {
+    return `https://picsum.photos/seed/${seed}/${w || 600}/${h || 750}`;
+  }
+  function todayISO() {
+    return (/* @__PURE__ */ new Date()).toISOString().slice(0, 10);
+  }
+  function daysAgoISO(n) {
+    const d = /* @__PURE__ */ new Date();
+    d.setDate(d.getDate() - n);
+    return d.toISOString().slice(0, 10);
+  }
+  function fmtDate(iso) {
+    const d = /* @__PURE__ */ new Date(iso + "T12:00:00");
+    return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
+  }
+  function fmtDateFull(iso) {
+    const d = /* @__PURE__ */ new Date(iso + "T12:00:00");
+    return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" });
+  }
+  function getSizesForProduct(p) {
+    if (p.variantType === "simple") return [];
+    const seen = [];
+    p.variants.forEach((v) => {
+      if (!seen.includes(v.size)) seen.push(v.size);
+    });
+    return seen;
+  }
+  function getColorsForSize(p, size) {
+    return p.variants.filter((v) => v.size === size);
+  }
+  function getVariantStock(p, size, color) {
+    const v = p.variants.find((v2) => v2.size === size && v2.color === color);
+    return v ? v.stock : 0;
+  }
+  function getTotalStock(p) {
+    if (p.variantType === "simple") return p.stock || 0;
+    return p.variants.reduce((s, v) => s + (Number(v.stock) || 0), 0);
+  }
+  function getDisplayPrice(p) {
+    return p.promoPrice ? p.promoPrice : p.price;
+  }
+  function seedDB() {
+    const categories = [
+      { id: "cat_camisas", name: "Camisas", slug: "camisas", image: img("clm-cat-camisas", 500, 500) },
+      { id: "cat_calcas", name: "Cal\xE7as", slug: "calcas", image: img("clm-cat-calcas", 500, 500) },
+      { id: "cat_moletons", name: "Moletons", slug: "moletons", image: img("clm-cat-moletons", 500, 500) },
+      { id: "cat_perfumes", name: "Perfumes", slug: "perfumes", image: img("clm-cat-perfumes", 500, 500) },
+      { id: "cat_acessorios", name: "Acess\xF3rios", slug: "acessorios", image: img("clm-cat-acessorios", 500, 500) }
+    ];
+    const products = [
+      {
+        id: "prod_1",
+        name: "Polo Premium Piquet",
+        categoryId: "cat_camisas",
+        description: "Polo em piquet de algod\xE3o com caimento slim e acabamento premium. Pe\xE7a essencial para compor looks do dia a dia com eleg\xE2ncia e conforto.",
+        price: 129.9,
+        promoPrice: null,
+        active: true,
+        isNew: true,
+        isFeatured: true,
+        images: [img("clm-polo1-a"), img("clm-polo1-b"), img("clm-polo1-c")],
+        variantType: "sizeColor",
+        variants: [
+          { size: "P", color: "Preto", hex: "#111111", stock: 6 },
+          { size: "M", color: "Preto", hex: "#111111", stock: 10 },
+          { size: "G", color: "Preto", hex: "#111111", stock: 8 },
+          { size: "GG", color: "Preto", hex: "#111111", stock: 0 },
+          { size: "P", color: "Marinho", hex: "#1B2A4A", stock: 5 },
+          { size: "M", color: "Marinho", hex: "#1B2A4A", stock: 7 },
+          { size: "G", color: "Marinho", hex: "#1B2A4A", stock: 4 }
+        ]
+      },
+      {
+        id: "prod_2",
+        name: "Camiseta Basic Algod\xE3o",
+        categoryId: "cat_camisas",
+        description: "Camiseta b\xE1sica 100% algod\xE3o penteado, modelagem reta e refor\xE7o na gola. Um cl\xE1ssico que n\xE3o sai de moda.",
+        price: 89.9,
+        promoPrice: null,
+        active: true,
+        isNew: true,
+        isFeatured: false,
+        images: [img("clm-basic1-a"), img("clm-basic1-b")],
+        variantType: "sizeColor",
+        variants: [
+          { size: "P", color: "Preto", hex: "#111111", stock: 12 },
+          { size: "M", color: "Preto", hex: "#111111", stock: 14 },
+          { size: "G", color: "Preto", hex: "#111111", stock: 9 },
+          { size: "P", color: "Branco", hex: "#F2F2F2", stock: 10 },
+          { size: "M", color: "Branco", hex: "#F2F2F2", stock: 6 },
+          { size: "M", color: "Vinho", hex: "#5C1A22", stock: 3 },
+          { size: "G", color: "Vinho", hex: "#5C1A22", stock: 0 }
+        ]
+      },
+      {
+        id: "prod_3",
+        name: "Camisa Social Slim",
+        categoryId: "cat_camisas",
+        description: "Camisa social de tricoline com corte slim, ideal para ocasi\xF5es formais ou para elevar o look casual.",
+        price: 149.9,
+        promoPrice: 129.9,
+        active: true,
+        isNew: false,
+        isFeatured: true,
+        images: [img("clm-social1-a"), img("clm-social1-b")],
+        variantType: "sizeColor",
+        variants: [
+          { size: "P", color: "Branco", hex: "#F2F2F2", stock: 5 },
+          { size: "M", color: "Branco", hex: "#F2F2F2", stock: 8 },
+          { size: "G", color: "Azul", hex: "#2A4A78", stock: 4 }
+        ]
+      },
+      {
+        id: "prod_4",
+        name: "Cal\xE7a Jeans Slim",
+        categoryId: "cat_calcas",
+        description: "Cal\xE7a jeans com elastano, corte slim que valoriza a silhueta sem perder o conforto.",
+        price: 179.9,
+        promoPrice: null,
+        active: true,
+        isNew: false,
+        isFeatured: true,
+        images: [img("clm-jeans1-a"), img("clm-jeans1-b")],
+        variantType: "sizeColor",
+        variants: [
+          { size: "38", color: "Azul", hex: "#2A4A78", stock: 6 },
+          { size: "40", color: "Azul", hex: "#2A4A78", stock: 9 },
+          { size: "42", color: "Azul", hex: "#2A4A78", stock: 5 },
+          { size: "40", color: "Preto", hex: "#111111", stock: 7 },
+          { size: "42", color: "Preto", hex: "#111111", stock: 0 }
+        ]
+      },
+      {
+        id: "prod_5",
+        name: "Cal\xE7a Sarja Alfaiataria",
+        categoryId: "cat_calcas",
+        description: "Cal\xE7a de sarja com modelagem alfaiataria, cintura confort\xE1vel e caimento impec\xE1vel.",
+        price: 169.9,
+        promoPrice: null,
+        active: true,
+        isNew: false,
+        isFeatured: false,
+        images: [img("clm-sarja1-a"), img("clm-sarja1-b")],
+        variantType: "sizeColor",
+        variants: [
+          { size: "38", color: "Bege", hex: "#C9B48A", stock: 4 },
+          { size: "40", color: "Bege", hex: "#C9B48A", stock: 6 },
+          { size: "40", color: "Preto", hex: "#111111", stock: 5 },
+          { size: "44", color: "Preto", hex: "#111111", stock: 3 }
+        ]
+      },
+      {
+        id: "prod_6",
+        name: "Moletom Canguru Premium",
+        categoryId: "cat_moletons",
+        description: "Moletom flanelado com bolso canguru e capuz forrado. Conforto e estilo para os dias mais frescos.",
+        price: 159.9,
+        promoPrice: 139.9,
+        active: true,
+        isNew: true,
+        isFeatured: true,
+        images: [img("clm-molcang-a"), img("clm-molcang-b"), img("clm-molcang-c")],
+        variantType: "sizeColor",
+        variants: [
+          { size: "M", color: "Preto", hex: "#111111", stock: 8 },
+          { size: "G", color: "Preto", hex: "#111111", stock: 6 },
+          { size: "GG", color: "Preto", hex: "#111111", stock: 2 },
+          { size: "M", color: "Cinza", hex: "#8A8A8A", stock: 5 },
+          { size: "G", color: "Cinza", hex: "#8A8A8A", stock: 0 }
+        ]
+      },
+      {
+        id: "prod_7",
+        name: "Moletom Estampado Urban",
+        categoryId: "cat_moletons",
+        description: "Moletom com estampa exclusiva na frente, tecido macio e caimento moderno.",
+        price: 149.9,
+        promoPrice: null,
+        active: true,
+        isNew: true,
+        isFeatured: false,
+        images: [img("clm-molurb-a"), img("clm-molurb-b")],
+        variantType: "sizeColor",
+        variants: [
+          { size: "M", color: "Caramelo", hex: "#A9682E", stock: 5 },
+          { size: "G", color: "Caramelo", hex: "#A9682E", stock: 3 },
+          { size: "G", color: "Preto", hex: "#111111", stock: 6 }
+        ]
+      },
+      {
+        id: "prod_8",
+        name: "Perfume Black Elegance 100ml",
+        categoryId: "cat_perfumes",
+        description: "Fragr\xE2ncia amadeirada e sofisticada, com boa fixa\xE7\xE3o para o dia a dia e ocasi\xF5es especiais.",
+        price: 299.9,
+        promoPrice: null,
+        active: true,
+        isNew: false,
+        isFeatured: true,
+        images: [img("clm-perf1-a"), img("clm-perf1-b")],
+        variantType: "simple",
+        stock: 8,
+        variants: []
+      },
+      {
+        id: "prod_9",
+        name: "Cinto Couro Premium",
+        categoryId: "cat_acessorios",
+        description: "Cinto em couro leg\xEDtimo com fivela em metal dourado escovado. Acabamento refinado.",
+        price: 79.9,
+        promoPrice: null,
+        active: true,
+        isNew: false,
+        isFeatured: false,
+        images: [img("clm-cinto1-a")],
+        variantType: "simple",
+        stock: 14,
+        variants: []
+      }
+    ];
+    const banners = [
+      {
+        id: "ban_1",
+        title: "CL MODAS",
+        subtitle: "Estilo que imp\xF5e confian\xE7a que fica.",
+        image: img("clm-banner-hero", 1200, 700),
+        buttonText: "Ver cole\xE7\xE3o",
+        active: true
+      },
+      {
+        id: "ban_2",
+        title: "Moletons da esta\xE7\xE3o",
+        subtitle: "At\xE9 15% off em pe\xE7as selecionadas.",
+        image: img("clm-banner-promo", 1200, 700),
+        buttonText: "Ver promo\xE7\xF5es",
+        active: true
+      }
+    ];
+    const coupons = [
+      { id: "cup_1", code: "BEMVINDO10", percent: 10, active: true },
+      { id: "cup_2", code: "CLMODAS15", percent: 15, active: false }
+    ];
+    const orders = [
+      { id: "1245", customerName: "Marcos Lima", phone: "5586999110022", items: [{ productId: "prod_6", name: "Moletom Canguru Premium", size: "G", color: "Preto", qty: 1, price: 139.9 }], total: 139.9, date: daysAgoISO(6), status: "Entregue" },
+      { id: "1246", customerName: "Lucas Almeida", phone: "5586998223344", items: [{ productId: "prod_4", name: "Cal\xE7a Jeans Slim", size: "40", color: "Azul", qty: 2, price: 179.9 }], total: 359.8, date: daysAgoISO(4), status: "Enviado" },
+      { id: "1247", customerName: "Pedro Santos", phone: "5586997334455", items: [{ productId: "prod_1", name: "Polo Premium Piquet", size: "M", color: "Preto", qty: 1, price: 129.9 }, { productId: "prod_9", name: "Cinto Couro Premium", size: "\xDAnico", color: "-", qty: 1, price: 79.9 }], total: 209.8, date: daysAgoISO(2), status: "Em prepara\xE7\xE3o" },
+      { id: "1248", customerName: "Jo\xE3o Oliveira", phone: "5586996445566", items: [{ productId: "prod_3", name: "Camisa Social Slim", size: "M", color: "Branco", qty: 1, price: 129.9 }], total: 129.9, date: daysAgoISO(1), status: "Novo" },
+      { id: "1249", customerName: "Carlos Souza", phone: "5586995556677", items: [{ productId: "prod_8", name: "Perfume Black Elegance 100ml", size: "\xDAnico", color: "-", qty: 1, price: 299.9 }], total: 299.9, date: todayISO(), status: "Confirmado" }
+    ];
+    const imageLibrary = [
+      { id: "lib_1", name: "Polo preta - frente", url: img("clm-lib-polo1"), tags: "polo camisa preta" },
+      { id: "lib_2", name: "Polo marinho", url: img("clm-lib-polo2"), tags: "polo camisa marinho azul" },
+      { id: "lib_3", name: "Camiseta branca", url: img("clm-lib-camiseta1"), tags: "camiseta basica branca" },
+      { id: "lib_4", name: "Camisa social", url: img("clm-lib-social1"), tags: "camisa social branca" },
+      { id: "lib_5", name: "Jeans slim", url: img("clm-lib-jeans1"), tags: "calca jeans azul" },
+      { id: "lib_6", name: "Sarja bege", url: img("clm-lib-sarja1"), tags: "calca sarja bege alfaiataria" },
+      { id: "lib_7", name: "Moletom preto", url: img("clm-lib-molet1"), tags: "moletom canguru preto" },
+      { id: "lib_8", name: "Moletom cinza", url: img("clm-lib-molet2"), tags: "moletom cinza" },
+      { id: "lib_9", name: "Perfume frasco", url: img("clm-lib-perfume1"), tags: "perfume frasco" },
+      { id: "lib_10", name: "Cinto couro", url: img("clm-lib-cinto1"), tags: "cinto couro acessorio" },
+      { id: "lib_11", name: "Rel\xF3gio", url: img("clm-lib-relogio1"), tags: "relogio acessorio" },
+      { id: "lib_12", name: "T\xEAnis casual", url: img("clm-lib-tenis1"), tags: "tenis calcado" },
+      { id: "lib_13", name: "Vitrine loja", url: img("clm-lib-loja1", 900, 600), tags: "loja fachada vitrine" },
+      { id: "lib_14", name: "Banner escuro 1", url: img("clm-lib-banner1", 1200, 700), tags: "banner hero escuro" },
+      { id: "lib_15", name: "Banner escuro 2", url: img("clm-lib-banner2", 1200, 700), tags: "banner hero escuro promo" }
+    ];
+    const settings = {
+      storeName: "CL MODAS",
+      tagline: "Estilo que imp\xF5e confian\xE7a que fica.",
+      whatsapp: WHATSAPP_DIGITS_DEFAULT,
+      whatsappDisplay: "+55 86 99435-0475",
+      instagram: "@clmodas.oficial_",
+      address: "Campo Maior - PI | Loja F\xEDsica",
+      freeShippingText: "Frete gr\xE1tis para compras acima de R$199"
+    };
+    return { categories, products, banners, coupons, orders, imageLibrary, settings, orderSeq: 1249 };
+  }
+  function GoldButton({ children, onClick, className, type, disabled, icon: Icon }) {
+    return /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        type: "button",
+        onClick,
+        disabled,
+        className: `inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-medium tracking-wide transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${type === "outline" ? "border" : ""} ${className || ""}`,
+        style: type === "outline" ? { borderColor: COLORS.gold, color: COLORS.gold, background: "transparent" } : { background: COLORS.gold, color: COLORS.ink },
+        onMouseEnter: (e) => {
+          if (!disabled && type !== "outline") e.currentTarget.style.background = COLORS.goldLight;
+        },
+        onMouseLeave: (e) => {
+          if (!disabled && type !== "outline") e.currentTarget.style.background = COLORS.gold;
+        }
+      },
+      Icon && /* @__PURE__ */ React.createElement(Icon, { size: 16 }),
+      children
+    );
+  }
+  function IconBtn({ onClick, children, label, active }) {
+    return /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        type: "button",
+        onClick,
+        "aria-label": label,
+        title: label,
+        className: "p-2 rounded-full transition-colors",
+        style: { color: active ? COLORS.gold : "inherit" },
+        onMouseEnter: (e) => e.currentTarget.style.background = "rgba(255,255,255,0.08)",
+        onMouseLeave: (e) => e.currentTarget.style.background = "transparent"
+      },
+      children
+    );
+  }
+  function Field({ label, children }) {
+    return /* @__PURE__ */ React.createElement("label", { className: "block mb-4" }, /* @__PURE__ */ React.createElement("span", { className: "block text-xs mb-1.5", style: { color: "#8A8377" } }, label), children);
+  }
+  const inputStyle = {
+    background: COLORS.inkSoft,
+    border: `1px solid ${COLORS.line}`,
+    color: COLORS.creamSoft
+  };
+  function TextInput(props) {
+    return /* @__PURE__ */ React.createElement(
+      "input",
+      {
+        ...props,
+        className: `w-full px-3 py-2 text-sm outline-none focus:ring-1 ${props.className || ""}`,
+        style: { ...inputStyle, ...props.style || {} }
+      }
+    );
+  }
+  function TextArea(props) {
+    return /* @__PURE__ */ React.createElement(
+      "textarea",
+      {
+        ...props,
+        className: `w-full px-3 py-2 text-sm outline-none focus:ring-1 ${props.className || ""}`,
+        style: { ...inputStyle, ...props.style || {} }
+      }
+    );
+  }
+  function SelectInput({ children, ...props }) {
+    return /* @__PURE__ */ React.createElement("select", { ...props, className: "w-full px-3 py-2 text-sm outline-none", style: inputStyle }, children);
+  }
+  function Checkbox({ checked, onChange, label }) {
+    return /* @__PURE__ */ React.createElement("label", { className: "flex items-center gap-2 text-sm cursor-pointer select-none mb-3", style: { color: COLORS.creamSoft } }, /* @__PURE__ */ React.createElement(
+      "span",
+      {
+        onClick: () => onChange(!checked),
+        className: "w-4.5 h-4.5 flex items-center justify-center flex-shrink-0",
+        style: { width: 18, height: 18, border: `1px solid ${checked ? COLORS.gold : COLORS.line}`, background: checked ? COLORS.gold : "transparent" }
+      },
+      checked && /* @__PURE__ */ React.createElement(Check, { size: 12, color: COLORS.ink })
+    ), /* @__PURE__ */ React.createElement("span", { onClick: () => onChange(!checked) }, label));
+  }
+  function Modal({ title, onClose, children, wide }) {
+    return /* @__PURE__ */ React.createElement("div", { className: "fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4", style: { background: "rgba(8,7,6,0.72)" }, onClick: onClose }, /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        onClick: (e) => e.stopPropagation(),
+        className: `w-full ${wide ? "sm:max-w-2xl" : "sm:max-w-md"} overflow-y-auto animate-modalIn`,
+        style: { background: COLORS.ink, border: `1px solid ${COLORS.line}`, maxHeight: "92vh" }
+      },
+      /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between px-5 py-4 sticky top-0 z-10", style: { background: COLORS.ink, borderBottom: `1px solid ${COLORS.line}` } }, /* @__PURE__ */ React.createElement("h3", { className: "text-base", style: { color: COLORS.creamSoft, fontFamily: "'Fraunces', serif" } }, title), /* @__PURE__ */ React.createElement("button", { onClick: onClose, "aria-label": "Fechar", className: "p-1" }, /* @__PURE__ */ React.createElement(X, { size: 18, color: "#8A8377" }))),
+      /* @__PURE__ */ React.createElement("div", { className: "p-5" }, children)
+    ));
+  }
+  function Toast({ toast }) {
+    if (!toast) return null;
+    return /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        className: "fixed bottom-5 left-1/2 -translate-x-1/2 px-4 py-3 flex items-center gap-2 text-sm shadow-lg animate-toastIn",
+        style: { background: toast.type === "error" ? "#3A1F18" : COLORS.charcoal, border: `1px solid ${toast.type === "error" ? COLORS.red : COLORS.gold}`, color: COLORS.creamSoft, maxWidth: "90vw", zIndex: 60 }
+      },
+      toast.type === "error" ? /* @__PURE__ */ React.createElement(AlertCircle, { size: 16, color: COLORS.red }) : /* @__PURE__ */ React.createElement(Check, { size: 16, color: COLORS.gold }),
+      toast.text
+    );
+  }
+  function StatusPill({ status }) {
+    const c = STATUS_COLORS[status] || COLORS.gold;
+    return /* @__PURE__ */ React.createElement("span", { className: "inline-flex items-center px-2.5 py-1 text-xs whitespace-nowrap", style: { background: c + "22", color: c, border: `1px solid ${c}55` } }, status);
+  }
+  function buildOrderMessage(storeName, items, subtotal, discount, total, customerName) {
+    let msg = `Ol\xE1! Meu nome \xE9 ${customerName || "___"} e gostaria de fazer um pedido na *${storeName}*:
+
+`;
+    items.forEach((it, i) => {
+      const sizeTxt = it.size && it.size !== "\xDAnico" ? `Tam: ${it.size}` : null;
+      const colorTxt = it.color && it.color !== "-" ? `Cor: ${it.color}` : null;
+      const extra = [sizeTxt, colorTxt].filter(Boolean).join(" | ");
+      msg += `${i + 1}. ${it.qty}x ${it.name}${extra ? ` (${extra})` : ""} \u2014 R$ ${brl(it.price)} cada
+`;
+    });
+    msg += `
+Subtotal: R$ ${brl(subtotal)}
+`;
+    if (discount > 0) msg += `Desconto: -R$ ${brl(discount)}
+`;
+    msg += `*Total: R$ ${brl(total)}*
+
+Aguardo a confirma\xE7\xE3o, obrigado!`;
+    return msg;
+  }
+  function waLink(digits, message) {
+    return `https://wa.me/${digits}?text=${encodeURIComponent(message)}`;
+  }
+  function compressImageFile(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error("Falha ao ler arquivo"));
+      reader.onload = (e) => {
+        const image = new window.Image();
+        image.onerror = () => reject(new Error("Falha ao carregar imagem"));
+        image.onload = () => {
+          const maxDim = 1080;
+          let { width, height } = image;
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round(height * maxDim / width);
+              width = maxDim;
+            } else {
+              width = Math.round(width * maxDim / height);
+              height = maxDim;
+            }
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(image, 0, 0, width, height);
+          resolve(canvas.toDataURL("image/jpeg", 0.82));
+        };
+        image.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+  function FileUploadButton({ onImages, multiple, label, className }) {
+    const [busy, setBusy] = useState(false);
+    async function handleChange(e) {
+      const files = Array.from(e.target.files || []);
+      if (files.length === 0) return;
+      setBusy(true);
+      const results = [];
+      for (const f of files) {
+        try {
+          results.push({ dataUrl: await compressImageFile(f), name: f.name });
+        } catch (err) {
+        }
+      }
+      setBusy(false);
+      if (results.length > 0) onImages(results);
+      e.target.value = "";
+    }
+    return /* @__PURE__ */ React.createElement("label", { className: `w-full flex items-center justify-center gap-2 py-3 text-sm cursor-pointer ${className || ""}`, style: { border: `1px dashed ${COLORS.line}`, color: "#B7AF9E" } }, /* @__PURE__ */ React.createElement(Upload, { size: 15 }), " ", busy ? "Enviando..." : label || "Enviar do celular/computador", /* @__PURE__ */ React.createElement("input", { type: "file", accept: "image/*", multiple, onChange: handleChange, style: { display: "none" } }));
+  }
+  function PublicHeader({ settings, categories, onNavHome, onNavCategory, onNavPromo, onSearch, favCount, cartCount, onOpenCart, onOpenFav, onOpenAdmin }) {
+    const [mobileOpen, setMobileOpen] = useState(false);
+    const [searchOpen, setSearchOpen] = useState(false);
+    const [q, setQ] = useState("");
+    function submitSearch() {
+      if (q.trim()) {
+        onSearch(q.trim());
+        setSearchOpen(false);
+        setMobileOpen(false);
+      }
+    }
+    return /* @__PURE__ */ React.createElement("header", { style: { background: COLORS.ink, borderBottom: `1px solid ${COLORS.line}` } }, /* @__PURE__ */ React.createElement("div", { className: "hidden md:flex items-center justify-between px-6 py-1.5 text-xs", style: { color: "#9B9384", borderBottom: `1px solid ${COLORS.line}` } }, /* @__PURE__ */ React.createElement("span", { className: "flex items-center gap-1.5" }, /* @__PURE__ */ React.createElement(MapPin, { size: 12 }), " ", settings.address), /* @__PURE__ */ React.createElement("span", null, settings.freeShippingText), /* @__PURE__ */ React.createElement("a", { href: `https://instagram.com/${settings.instagram.replace("@", "")}`, target: "_blank", rel: "noreferrer", className: "flex items-center gap-1.5 hover:text-white" }, /* @__PURE__ */ React.createElement(Instagram, { size: 12 }), " ", settings.instagram)), /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between px-4 md:px-6 py-3.5" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-3" }, /* @__PURE__ */ React.createElement("button", { className: "md:hidden p-1", onClick: () => setMobileOpen(true), "aria-label": "Abrir menu" }, /* @__PURE__ */ React.createElement(Menu, { size: 22, color: COLORS.creamSoft })), /* @__PURE__ */ React.createElement("button", { onClick: onNavHome, className: "flex items-center gap-2" }, /* @__PURE__ */ React.createElement("span", { className: "flex flex-col items-center leading-none" }, /* @__PURE__ */ React.createElement(Crown, { size: 15, color: COLORS.gold }), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Fraunces', serif", fontSize: 22, letterSpacing: 1, color: COLORS.creamSoft } }, "CL")), /* @__PURE__ */ React.createElement("span", { className: "hidden sm:flex flex-col leading-none text-left" }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Fraunces', serif", fontSize: 15, color: COLORS.creamSoft, letterSpacing: 1 } }, settings.storeName.split(" ")[0]), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 10, letterSpacing: 3, color: COLORS.gold } }, "MODAS")))), /* @__PURE__ */ React.createElement("nav", { className: "hidden md:flex items-center gap-7 text-sm", style: { color: COLORS.creamSoft } }, /* @__PURE__ */ React.createElement("button", { onClick: onNavHome, className: "hover:opacity-70" }, "In\xEDcio"), categories.map((c) => /* @__PURE__ */ React.createElement("button", { key: c.id, onClick: () => onNavCategory(c.id), className: "hover:opacity-70" }, c.name)), /* @__PURE__ */ React.createElement("button", { onClick: onNavPromo, className: "hover:opacity-70", style: { color: COLORS.gold } }, "Promo\xE7\xF5es")), /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-1" }, /* @__PURE__ */ React.createElement("div", { className: "hidden sm:flex items-center relative" }, searchOpen ? /* @__PURE__ */ React.createElement("div", { className: "flex items-center", style: { background: COLORS.inkSoft, border: `1px solid ${COLORS.line}` } }, /* @__PURE__ */ React.createElement(
+      "input",
+      {
+        autoFocus: true,
+        value: q,
+        onChange: (e) => setQ(e.target.value),
+        onKeyDown: (e) => e.key === "Enter" && submitSearch(),
+        placeholder: "Buscar produtos...",
+        className: "bg-transparent px-3 py-1.5 text-sm outline-none w-48",
+        style: { color: COLORS.creamSoft }
+      }
+    ), /* @__PURE__ */ React.createElement("button", { onClick: submitSearch, className: "px-2" }, /* @__PURE__ */ React.createElement(Search, { size: 16, color: COLORS.gold }))) : /* @__PURE__ */ React.createElement(IconBtn, { onClick: () => setSearchOpen(true), label: "Buscar" }, /* @__PURE__ */ React.createElement(Search, { size: 19, color: COLORS.creamSoft }))), /* @__PURE__ */ React.createElement("button", { className: "sm:hidden p-2", onClick: () => setSearchOpen((s) => !s), "aria-label": "Buscar" }, /* @__PURE__ */ React.createElement(Search, { size: 19, color: COLORS.creamSoft })), /* @__PURE__ */ React.createElement(IconBtn, { onClick: onOpenFav, label: "Favoritos" }, /* @__PURE__ */ React.createElement("span", { className: "relative" }, /* @__PURE__ */ React.createElement(Heart, { size: 19, color: COLORS.creamSoft }), favCount > 0 && /* @__PURE__ */ React.createElement(Badge, { n: favCount }))), /* @__PURE__ */ React.createElement(IconBtn, { onClick: onOpenCart, label: "Carrinho" }, /* @__PURE__ */ React.createElement("span", { className: "relative" }, /* @__PURE__ */ React.createElement(ShoppingBag, { size: 19, color: COLORS.creamSoft }), cartCount > 0 && /* @__PURE__ */ React.createElement(Badge, { n: cartCount }))))), searchOpen && /* @__PURE__ */ React.createElement("div", { className: "sm:hidden px-4 pb-3 flex items-center gap-2" }, /* @__PURE__ */ React.createElement(
+      "input",
+      {
+        autoFocus: true,
+        value: q,
+        onChange: (e) => setQ(e.target.value),
+        onKeyDown: (e) => e.key === "Enter" && submitSearch(),
+        placeholder: "Buscar produtos...",
+        className: "flex-1 px-3 py-2 text-sm outline-none",
+        style: inputStyle
+      }
+    ), /* @__PURE__ */ React.createElement("button", { onClick: submitSearch, className: "px-3 py-2", style: { background: COLORS.gold } }, /* @__PURE__ */ React.createElement(Search, { size: 16, color: COLORS.ink }))), mobileOpen && /* @__PURE__ */ React.createElement("div", { className: "fixed inset-0 z-50 flex", onClick: () => setMobileOpen(false) }, /* @__PURE__ */ React.createElement("div", { className: "w-72 h-full p-5 animate-slideRight", style: { background: COLORS.ink, borderRight: `1px solid ${COLORS.line}` }, onClick: (e) => e.stopPropagation() }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between mb-8" }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Fraunces', serif", fontSize: 18, color: COLORS.creamSoft } }, "Menu"), /* @__PURE__ */ React.createElement("button", { onClick: () => setMobileOpen(false) }, /* @__PURE__ */ React.createElement(X, { size: 20, color: COLORS.creamSoft }))), /* @__PURE__ */ React.createElement("div", { className: "flex flex-col gap-5 text-sm", style: { color: COLORS.creamSoft } }, /* @__PURE__ */ React.createElement("button", { className: "text-left", onClick: () => {
+      onNavHome();
+      setMobileOpen(false);
+    } }, "In\xEDcio"), categories.map((c) => /* @__PURE__ */ React.createElement("button", { key: c.id, className: "text-left", onClick: () => {
+      onNavCategory(c.id);
+      setMobileOpen(false);
+    } }, c.name)), /* @__PURE__ */ React.createElement("button", { className: "text-left", style: { color: COLORS.gold }, onClick: () => {
+      onNavPromo();
+      setMobileOpen(false);
+    } }, "Promo\xE7\xF5es"))), /* @__PURE__ */ React.createElement("div", { className: "flex-1" })));
+  }
+  function Badge({ n }) {
+    return /* @__PURE__ */ React.createElement("span", { className: "absolute -top-1.5 -right-1.5 w-4 h-4 flex items-center justify-center rounded-full", style: { background: COLORS.gold, color: COLORS.ink, fontSize: "10px" } }, n > 9 ? "9+" : n);
+  }
+  function Hero({ banners, onCta }) {
+    const active = banners.filter((b2) => b2.active);
+    const [i, setI] = useState(0);
+    useEffect(() => {
+      if (i >= active.length) setI(0);
+    }, [active.length]);
+    if (active.length === 0) return null;
+    const b = active[i];
+    return /* @__PURE__ */ React.createElement("div", { className: "relative w-full", style: { background: COLORS.ink } }, /* @__PURE__ */ React.createElement("div", { className: "relative overflow-hidden", style: { height: "min(78vh, 560px)", minHeight: 420 } }, /* @__PURE__ */ React.createElement("img", { key: b.id, src: b.image, alt: b.title, className: "absolute inset-0 w-full h-full object-cover animate-fadeIn", style: { opacity: 0.55 } }), /* @__PURE__ */ React.createElement("div", { className: "absolute inset-0", style: { background: "linear-gradient(90deg, rgba(19,17,16,0.95) 20%, rgba(19,17,16,0.35) 75%)" } }), /* @__PURE__ */ React.createElement("div", { className: "relative h-full flex flex-col justify-center px-6 md:px-16 max-w-xl" }, /* @__PURE__ */ React.createElement("span", { className: "text-xs mb-4", style: { color: COLORS.gold, letterSpacing: "3px" } }, "MODA MASCULINA \xB7 CAMPO MAIOR-PI"), /* @__PURE__ */ React.createElement("h1", { style: { fontFamily: "'Fraunces', serif", fontSize: "clamp(2.4rem, 6vw, 4rem)", color: COLORS.creamSoft, lineHeight: 1.05 } }, b.title), /* @__PURE__ */ React.createElement("p", { className: "mt-4 text-base md:text-lg", style: { color: "#C9C2B3" } }, b.subtitle), /* @__PURE__ */ React.createElement("div", { className: "mt-8" }, /* @__PURE__ */ React.createElement(GoldButton, { onClick: onCta }, b.buttonText || "Ver cole\xE7\xE3o"))), active.length > 1 && /* @__PURE__ */ React.createElement("div", { className: "absolute bottom-5 left-6 md:left-16 flex gap-2" }, active.map((_, idx) => /* @__PURE__ */ React.createElement("button", { key: idx, onClick: () => setI(idx), className: "w-6 h-0.5", style: { background: idx === i ? COLORS.gold : "#5A5347" } })))));
+  }
+  function TrustStrip() {
+    const items = [
+      { icon: Users, t: "Atendimento personalizado" },
+      { icon: Package, t: "Envio r\xE1pido para todo Brasil" },
+      { icon: Check, t: "Compra segura, 100% protegida" }
+    ];
+    return /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-1 sm:grid-cols-3 gap-6 px-6 md:px-16 py-8", style: { background: COLORS.creamSoft, borderBottom: `1px solid ${COLORS.lineOnCream}` } }, items.map((it, i) => /* @__PURE__ */ React.createElement("div", { key: i, className: "flex items-center gap-3" }, /* @__PURE__ */ React.createElement(it.icon, { size: 20, color: COLORS.goldDeep }), /* @__PURE__ */ React.createElement("span", { className: "text-sm", style: { color: COLORS.ink } }, it.t))));
+  }
+  function CategoryRail({ categories, onPick }) {
+    return /* @__PURE__ */ React.createElement("section", { className: "px-6 md:px-16 py-12", style: { background: COLORS.creamSoft } }, /* @__PURE__ */ React.createElement("h2", { style: { fontFamily: "'Fraunces', serif", fontSize: 26, color: COLORS.ink } }, "Categorias"), /* @__PURE__ */ React.createElement("div", { className: "mt-6 flex gap-4 overflow-x-auto pb-2 sm:grid sm:grid-cols-3 md:grid-cols-5 sm:overflow-visible" }, categories.map((c) => /* @__PURE__ */ React.createElement("button", { key: c.id, onClick: () => onPick(c.id), className: "relative flex-shrink-0 w-36 sm:w-auto overflow-hidden group", style: { aspectRatio: "4 / 5" } }, /* @__PURE__ */ React.createElement("img", { src: c.image, alt: c.name, className: "w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" }), /* @__PURE__ */ React.createElement("div", { className: "absolute inset-0", style: { background: "linear-gradient(to top, rgba(0,0,0,0.75), rgba(0,0,0,0.05))" } }), /* @__PURE__ */ React.createElement("span", { className: "absolute bottom-3 left-3 text-sm text-white", style: { fontFamily: "'Fraunces', serif" } }, c.name)))));
+  }
+  function ProductCard({ p, onOpen, isFav, onToggleFav }) {
+    const stock = getTotalStock(p);
+    const outOfStock = stock <= 0;
+    return /* @__PURE__ */ React.createElement("div", { className: "group relative" }, /* @__PURE__ */ React.createElement("button", { onClick: () => onOpen(p.id), className: "block w-full text-left" }, /* @__PURE__ */ React.createElement("div", { className: "relative overflow-hidden", style: { background: COLORS.lineOnCream, aspectRatio: "4 / 5" } }, /* @__PURE__ */ React.createElement("img", { src: p.images[0], alt: p.name, className: `w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${outOfStock ? "opacity-50 grayscale" : ""}` }), /* @__PURE__ */ React.createElement("div", { className: "absolute top-2 left-2 flex flex-col gap-1" }, p.isNew && !outOfStock && /* @__PURE__ */ React.createElement("span", { className: "px-2 py-1", style: { background: COLORS.ink, color: COLORS.gold, fontSize: "10px" } }, "NOVO"), p.promoPrice && !outOfStock && /* @__PURE__ */ React.createElement("span", { className: "px-2 py-1", style: { background: COLORS.gold, color: COLORS.ink, fontSize: "10px" } }, "OFERTA"), outOfStock && /* @__PURE__ */ React.createElement("span", { className: "px-2 py-1", style: { background: "#2A2620", color: "#B7AF9E", fontSize: "10px" } }, "ESGOTADO")))), /* @__PURE__ */ React.createElement("button", { onClick: () => onToggleFav(p.id), "aria-label": "Favoritar", className: "absolute top-2 right-2 p-1.5 rounded-full", style: { background: "rgba(19,17,16,0.55)" } }, /* @__PURE__ */ React.createElement(Heart, { size: 16, color: isFav ? COLORS.gold : "#fff", fill: isFav ? COLORS.gold : "none" })), /* @__PURE__ */ React.createElement("div", { className: "mt-3 cursor-pointer", onClick: () => onOpen(p.id) }, /* @__PURE__ */ React.createElement("p", { className: "text-sm", style: { color: COLORS.ink } }, p.name), /* @__PURE__ */ React.createElement("div", { className: "mt-1 flex items-center gap-2" }, p.promoPrice ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("span", { className: "text-xs line-through", style: { color: "#A69C89" } }, "R$ ", brl(p.price)), /* @__PURE__ */ React.createElement("span", { className: "text-sm font-medium", style: { color: COLORS.goldDeep } }, "R$ ", brl(p.promoPrice))) : /* @__PURE__ */ React.createElement("span", { className: "text-sm font-medium", style: { color: COLORS.ink } }, "R$ ", brl(p.price)))));
+  }
+  function ProductSection({ title, products, onOpen, favorites, onToggleFav, onSeeAll }) {
+    if (products.length === 0) return null;
+    return /* @__PURE__ */ React.createElement("section", { className: "px-6 md:px-16 py-12", style: { background: COLORS.creamSoft } }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React.createElement("h2", { style: { fontFamily: "'Fraunces', serif", fontSize: 26, color: COLORS.ink } }, title), onSeeAll && /* @__PURE__ */ React.createElement("button", { onClick: onSeeAll, className: "text-xs tracking-wide", style: { color: COLORS.goldDeep } }, "Ver todos")), /* @__PURE__ */ React.createElement("div", { className: "mt-6 grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-8" }, products.map((p) => /* @__PURE__ */ React.createElement(ProductCard, { key: p.id, p, onOpen, isFav: favorites.includes(p.id), onToggleFav }))));
+  }
+  function FilterPanel({ allSizes, allColors, maxPossiblePrice, filters, setFilters }) {
+    function toggle(arrKey, val) {
+      setFilters((f) => {
+        const arr = f[arrKey].includes(val) ? f[arrKey].filter((x) => x !== val) : [...f[arrKey], val];
+        return { ...f, [arrKey]: arr };
+      });
+    }
+    return /* @__PURE__ */ React.createElement("div", { className: "space-y-6 text-sm" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { className: "text-xs tracking-wide mb-2", style: { color: "#8A8377" } }, "Pre\xE7o at\xE9"), /* @__PURE__ */ React.createElement(
+      "input",
+      {
+        type: "range",
+        min: 0,
+        max: maxPossiblePrice,
+        step: 10,
+        value: filters.maxPrice ?? maxPossiblePrice,
+        onChange: (e) => setFilters((f) => ({ ...f, maxPrice: Number(e.target.value) })),
+        className: "w-full"
+      }
+    ), /* @__PURE__ */ React.createElement("p", { style: { color: COLORS.creamSoft } }, "R$ ", brl(filters.maxPrice ?? maxPossiblePrice))), allSizes.length > 0 && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { className: "text-xs tracking-wide mb-2", style: { color: "#8A8377" } }, "Tamanho"), /* @__PURE__ */ React.createElement("div", { className: "flex flex-wrap gap-2" }, allSizes.map((s) => /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        key: s,
+        onClick: () => toggle("sizes", s),
+        className: "px-3 py-1 text-xs border",
+        style: { borderColor: filters.sizes.includes(s) ? COLORS.gold : COLORS.line, color: filters.sizes.includes(s) ? COLORS.gold : COLORS.creamSoft }
+      },
+      s
+    )))), allColors.length > 0 && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { className: "text-xs tracking-wide mb-2", style: { color: "#8A8377" } }, "Cor"), /* @__PURE__ */ React.createElement("div", { className: "flex flex-wrap gap-2" }, allColors.map((c) => /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        key: c.color,
+        onClick: () => toggle("colors", c.color),
+        title: c.color,
+        className: "w-7 h-7 rounded-full border-2",
+        style: { background: c.hex, borderColor: filters.colors.includes(c.color) ? COLORS.gold : "transparent" }
+      }
+    )))), /* @__PURE__ */ React.createElement(Checkbox, { checked: filters.inStockOnly, onChange: (v) => setFilters((f) => ({ ...f, inStockOnly: v })), label: "Somente dispon\xEDveis" }));
+  }
+  function ProductListPage({ products, categories, activeCategoryId, searchQuery, promoOnly, onOpen, favorites, onToggleFav }) {
+    const [filters, setFilters] = useState({ sizes: [], colors: [], maxPrice: null, inStockOnly: false });
+    const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+    useEffect(() => {
+      setFilters({ sizes: [], colors: [], maxPrice: null, inStockOnly: false });
+    }, [activeCategoryId, searchQuery, promoOnly]);
+    const scoped = useMemo(() => {
+      let list = products.filter((p) => p.active);
+      if (activeCategoryId) list = list.filter((p) => p.categoryId === activeCategoryId);
+      if (promoOnly) list = list.filter((p) => !!p.promoPrice);
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        list = list.filter((p) => p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q));
+      }
+      return list;
+    }, [products, activeCategoryId, searchQuery, promoOnly]);
+    const allSizes = useMemo(() => {
+      const s = /* @__PURE__ */ new Set();
+      scoped.forEach((p) => p.variants.forEach((v) => s.add(v.size)));
+      return [...s];
+    }, [scoped]);
+    const allColors = useMemo(() => {
+      const m = /* @__PURE__ */ new Map();
+      scoped.forEach((p) => p.variants.forEach((v) => m.set(v.color, v.hex)));
+      return [...m.entries()].map(([color, hex]) => ({ color, hex }));
+    }, [scoped]);
+    const maxPossiblePrice = useMemo(() => Math.max(10, ...scoped.map((p) => getDisplayPrice(p))), [scoped]);
+    const filtered = useMemo(() => {
+      return scoped.filter((p) => {
+        if (filters.maxPrice != null && getDisplayPrice(p) > filters.maxPrice) return false;
+        if (filters.inStockOnly && getTotalStock(p) <= 0) return false;
+        if (filters.sizes.length > 0 && !p.variants.some((v) => filters.sizes.includes(v.size))) return false;
+        if (filters.colors.length > 0 && !p.variants.some((v) => filters.colors.includes(v.color))) return false;
+        return true;
+      });
+    }, [scoped, filters]);
+    const cat = categories.find((c) => c.id === activeCategoryId);
+    const title = searchQuery ? `Resultados para "${searchQuery}"` : promoOnly ? "Promo\xE7\xF5es" : cat ? cat.name : "Todos os produtos";
+    return /* @__PURE__ */ React.createElement("div", { className: "px-6 md:px-16 py-10", style: { background: COLORS.creamSoft, minHeight: "60vh" } }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between mb-8" }, /* @__PURE__ */ React.createElement("h1", { style: { fontFamily: "'Fraunces', serif", fontSize: 28, color: COLORS.ink } }, title), /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        className: "lg:hidden flex items-center gap-1.5 text-sm px-3 py-2 border",
+        style: { borderColor: COLORS.lineOnCream, color: COLORS.ink },
+        onClick: () => setMobileFiltersOpen(true)
+      },
+      /* @__PURE__ */ React.createElement(SlidersHorizontal, { size: 15 }),
+      " Filtrar"
+    )), /* @__PURE__ */ React.createElement("div", { className: "flex gap-10" }, /* @__PURE__ */ React.createElement("aside", { className: "hidden lg:block w-56 flex-shrink-0" }, /* @__PURE__ */ React.createElement("div", { className: "sticky top-24 p-5", style: { background: "#131110" } }, /* @__PURE__ */ React.createElement(FilterPanel, { allSizes, allColors, maxPossiblePrice, filters, setFilters }))), /* @__PURE__ */ React.createElement("div", { className: "flex-1" }, filtered.length === 0 ? /* @__PURE__ */ React.createElement("p", { className: "text-sm py-16 text-center", style: { color: "#8A8377" } }, "Nenhum produto encontrado com esses filtros.") : /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-8" }, filtered.map((p) => /* @__PURE__ */ React.createElement(ProductCard, { key: p.id, p, onOpen, isFav: favorites.includes(p.id), onToggleFav }))))), mobileFiltersOpen && /* @__PURE__ */ React.createElement(Modal, { title: "Filtrar produtos", onClose: () => setMobileFiltersOpen(false) }, /* @__PURE__ */ React.createElement(FilterPanel, { allSizes, allColors, maxPossiblePrice, filters, setFilters }), /* @__PURE__ */ React.createElement(GoldButton, { className: "w-full mt-4", onClick: () => setMobileFiltersOpen(false) }, "Ver resultados")));
+  }
+  function ProductDetailPage({ product, settings, onAddToCart, onBuyNowWhatsapp, isFav, onToggleFav, onBack }) {
+    const [imgIdx, setImgIdx] = useState(0);
+    const [size, setSize] = useState(null);
+    const [color, setColor] = useState(null);
+    const [qty, setQty] = useState(1);
+    useEffect(() => {
+      setImgIdx(0);
+      setSize(null);
+      setColor(null);
+      setQty(1);
+    }, [product.id]);
+    useEffect(() => {
+      const szs = getSizesForProduct(product);
+      if (szs.length === 1) setSize(szs[0]);
+    }, [product.id]);
+    useEffect(() => {
+      if (size) {
+        const cs = getColorsForSize(product, size);
+        if (cs.length === 1) setColor(cs[0].color);
+      }
+    }, [size, product.id]);
+    const sizes = getSizesForProduct(product);
+    const colorsForSize = size ? getColorsForSize(product, size) : [];
+    const currentStock = product.variantType === "simple" ? product.stock : size && color ? getVariantStock(product, size, color) : null;
+    const canAdd = product.variantType === "simple" ? product.stock > 0 : size && color && currentStock > 0;
+    return /* @__PURE__ */ React.createElement("div", { className: "px-6 md:px-16 py-8", style: { background: COLORS.creamSoft, minHeight: "70vh" } }, /* @__PURE__ */ React.createElement("button", { onClick: onBack, className: "flex items-center gap-1.5 text-xs mb-6", style: { color: COLORS.goldDeep } }, /* @__PURE__ */ React.createElement(ArrowLeft, { size: 14 }), " Voltar"), /* @__PURE__ */ React.createElement("div", { className: "grid md:grid-cols-2 gap-10" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { className: "overflow-hidden mb-3", style: { background: COLORS.lineOnCream, aspectRatio: "4 / 5" } }, /* @__PURE__ */ React.createElement("img", { src: product.images[imgIdx], alt: product.name, className: "w-full h-full object-cover animate-fadeIn", key: imgIdx })), product.images.length > 1 && /* @__PURE__ */ React.createElement("div", { className: "flex gap-2" }, product.images.map((im, i) => /* @__PURE__ */ React.createElement("button", { key: i, onClick: () => setImgIdx(i), className: "w-16 h-20 overflow-hidden border-2", style: { borderColor: i === imgIdx ? COLORS.gold : "transparent" } }, /* @__PURE__ */ React.createElement("img", { src: im, className: "w-full h-full object-cover" }))))), /* @__PURE__ */ React.createElement("div", { className: "max-w-md" }, /* @__PURE__ */ React.createElement("h1", { style: { fontFamily: "'Fraunces', serif", fontSize: 30, color: COLORS.ink } }, product.name), /* @__PURE__ */ React.createElement("div", { className: "mt-2 flex items-center gap-3" }, product.promoPrice ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("span", { className: "text-base line-through", style: { color: "#A69C89" } }, "R$ ", brl(product.price)), /* @__PURE__ */ React.createElement("span", { className: "text-2xl", style: { color: COLORS.goldDeep } }, "R$ ", brl(product.promoPrice))) : /* @__PURE__ */ React.createElement("span", { className: "text-2xl", style: { color: COLORS.ink } }, "R$ ", brl(product.price))), /* @__PURE__ */ React.createElement("p", { className: "mt-4 text-sm leading-relaxed", style: { color: "#5A5347" } }, product.description), sizes.length > 0 && /* @__PURE__ */ React.createElement("div", { className: "mt-6" }, /* @__PURE__ */ React.createElement("p", { className: "text-xs tracking-wide mb-2", style: { color: "#8A8377" } }, "Tamanho"), /* @__PURE__ */ React.createElement("div", { className: "flex flex-wrap gap-2" }, sizes.map((s) => {
+      const hasStock = getColorsForSize(product, s).some((v) => v.stock > 0);
+      return /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          key: s,
+          onClick: () => {
+            setSize(s);
+            setColor(null);
+          },
+          disabled: !hasStock,
+          className: "px-3.5 py-2 text-sm border",
+          style: {
+            borderColor: size === s ? COLORS.ink : COLORS.lineOnCream,
+            color: hasStock ? size === s ? COLORS.creamSoft : COLORS.ink : "#B7AF9E",
+            textDecoration: hasStock ? "none" : "line-through",
+            background: size === s ? COLORS.ink : "transparent"
+          }
+        },
+        s
+      );
+    }))), size && colorsForSize.length > 0 && /* @__PURE__ */ React.createElement("div", { className: "mt-5" }, /* @__PURE__ */ React.createElement("p", { className: "text-xs tracking-wide mb-2", style: { color: "#8A8377" } }, "Cor ", color ? `\u2014 ${color}` : ""), /* @__PURE__ */ React.createElement("div", { className: "flex flex-wrap gap-2" }, colorsForSize.map((v) => /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        key: v.color,
+        onClick: () => v.stock > 0 && setColor(v.color),
+        disabled: v.stock <= 0,
+        title: v.stock > 0 ? v.color : `${v.color} \u2014 Esgotado`,
+        className: "w-9 h-9 rounded-full border-2 relative",
+        style: { background: v.hex, borderColor: color === v.color ? COLORS.gold : "transparent", opacity: v.stock > 0 ? 1 : 0.3 }
+      },
+      v.stock <= 0 && /* @__PURE__ */ React.createElement(X, { size: 12, className: "absolute inset-0 m-auto", color: "#fff" })
+    )))), product.variantType !== "simple" && sizes.length > 0 && !size && /* @__PURE__ */ React.createElement("p", { className: "mt-3 text-xs", style: { color: COLORS.goldDeep } }, "Selecione um tamanho para continuar."), product.variantType !== "simple" && size && colorsForSize.length > 0 && !color && /* @__PURE__ */ React.createElement("p", { className: "mt-3 text-xs", style: { color: COLORS.goldDeep } }, "Selecione uma cor para continuar."), product.variantType !== "simple" && size && color && currentStock <= 0 && /* @__PURE__ */ React.createElement("p", { className: "mt-3 text-xs", style: { color: COLORS.red } }, "Esgotado nessa combina\xE7\xE3o."), product.variantType === "simple" && product.stock <= 0 && /* @__PURE__ */ React.createElement("p", { className: "mt-3 text-xs", style: { color: COLORS.red } }, "Produto esgotado."), /* @__PURE__ */ React.createElement("div", { className: "mt-6 flex items-center gap-4" }, /* @__PURE__ */ React.createElement("p", { className: "text-xs tracking-wide", style: { color: "#8A8377" } }, "Quantidade"), /* @__PURE__ */ React.createElement("div", { className: "flex items-center border", style: { borderColor: COLORS.lineOnCream } }, /* @__PURE__ */ React.createElement("button", { className: "px-3 py-1.5", onClick: () => setQty((q) => Math.max(1, q - 1)) }, /* @__PURE__ */ React.createElement(Minus, { size: 14 })), /* @__PURE__ */ React.createElement("span", { className: "px-3 text-sm", style: { color: COLORS.ink } }, qty), /* @__PURE__ */ React.createElement("button", { className: "px-3 py-1.5", onClick: () => setQty((q) => currentStock ? Math.min(currentStock, q + 1) : q + 1) }, /* @__PURE__ */ React.createElement(Plus, { size: 14 })))), /* @__PURE__ */ React.createElement("div", { className: "mt-7 flex flex-col gap-3" }, /* @__PURE__ */ React.createElement(GoldButton, { disabled: !canAdd, onClick: () => onAddToCart(product, size || "\xDAnico", color || "-", qty), icon: ShoppingBag }, "Adicionar ao carrinho"), /* @__PURE__ */ React.createElement(GoldButton, { type: "outline", disabled: !canAdd, onClick: () => onBuyNowWhatsapp(product, size || "\xDAnico", color || "-", qty), icon: MessageCircle }, "Comprar direto pelo WhatsApp"), /* @__PURE__ */ React.createElement("button", { onClick: () => onToggleFav(product.id), className: "flex items-center gap-2 text-sm mt-1", style: { color: COLORS.ink } }, /* @__PURE__ */ React.createElement(Heart, { size: 16, color: isFav ? COLORS.gold : COLORS.ink, fill: isFav ? COLORS.gold : "none" }), isFav ? "Remover dos favoritos" : "Adicionar aos favoritos")))));
+  }
+  function CartPage({ cart, products, coupons, settings, onUpdateQty, onRemove, onCheckout, onBack }) {
+    const [couponCode, setCouponCode] = useState("");
+    const [appliedCoupon, setAppliedCoupon] = useState(null);
+    const [name, setName] = useState("");
+    const [phone, setPhone] = useState("");
+    const [couponMsg, setCouponMsg] = useState("");
+    const detailed = cart.map((it) => ({ ...it, product: products.find((p) => p.id === it.productId) })).filter((it) => it.product);
+    const subtotal = detailed.reduce((s, it) => s + getDisplayPrice(it.product) * it.qty, 0);
+    const discount = appliedCoupon ? subtotal * (appliedCoupon.percent / 100) : 0;
+    const total = subtotal - discount;
+    function applyCoupon() {
+      const found = coupons.find((c) => c.code.toLowerCase() === couponCode.trim().toLowerCase() && c.active);
+      if (found) {
+        setAppliedCoupon(found);
+        setCouponMsg(`Cupom aplicado: -${found.percent}%`);
+      } else {
+        setAppliedCoupon(null);
+        setCouponMsg("Cupom inv\xE1lido ou expirado.");
+      }
+    }
+    return /* @__PURE__ */ React.createElement("div", { className: "px-6 md:px-16 py-8", style: { background: COLORS.creamSoft, minHeight: "70vh" } }, /* @__PURE__ */ React.createElement("button", { onClick: onBack, className: "flex items-center gap-1.5 text-xs mb-6", style: { color: COLORS.goldDeep } }, /* @__PURE__ */ React.createElement(ArrowLeft, { size: 14 }), " Continuar comprando"), /* @__PURE__ */ React.createElement("h1", { style: { fontFamily: "'Fraunces', serif", fontSize: 28, color: COLORS.ink } }, "Carrinho"), detailed.length === 0 ? /* @__PURE__ */ React.createElement("p", { className: "mt-8 text-sm", style: { color: "#8A8377" } }, "Seu carrinho est\xE1 vazio.") : /* @__PURE__ */ React.createElement("div", { className: "mt-8 grid lg:grid-cols-3 gap-10" }, /* @__PURE__ */ React.createElement("div", { className: "lg:col-span-2 space-y-5" }, detailed.map((it, idx) => /* @__PURE__ */ React.createElement("div", { key: idx, className: "flex gap-4 pb-5", style: { borderBottom: `1px solid ${COLORS.lineOnCream}` } }, /* @__PURE__ */ React.createElement("img", { src: it.product.images[0], className: "w-20 h-24 object-cover flex-shrink-0" }), /* @__PURE__ */ React.createElement("div", { className: "flex-1 min-w-0" }, /* @__PURE__ */ React.createElement("p", { className: "text-sm", style: { color: COLORS.ink } }, it.product.name), /* @__PURE__ */ React.createElement("p", { className: "text-xs mt-1", style: { color: "#8A8377" } }, it.size !== "\xDAnico" ? `Tam: ${it.size} ` : "", it.color !== "-" ? `\xB7 Cor: ${it.color}` : ""), /* @__PURE__ */ React.createElement("p", { className: "text-sm mt-1", style: { color: COLORS.goldDeep } }, "R$ ", brl(getDisplayPrice(it.product))), /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-3 mt-2" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center border", style: { borderColor: COLORS.lineOnCream } }, /* @__PURE__ */ React.createElement("button", { className: "px-2 py-1", onClick: () => onUpdateQty(idx, Math.max(1, it.qty - 1)) }, /* @__PURE__ */ React.createElement(Minus, { size: 12 })), /* @__PURE__ */ React.createElement("span", { className: "px-2 text-xs" }, it.qty), /* @__PURE__ */ React.createElement("button", { className: "px-2 py-1", onClick: () => onUpdateQty(idx, it.qty + 1) }, /* @__PURE__ */ React.createElement(Plus, { size: 12 }))), /* @__PURE__ */ React.createElement("button", { onClick: () => onRemove(idx), "aria-label": "Remover" }, /* @__PURE__ */ React.createElement(Trash2, { size: 15, color: COLORS.red }))))))), /* @__PURE__ */ React.createElement("div", { className: "p-6 h-fit", style: { background: COLORS.ink } }, /* @__PURE__ */ React.createElement(Field, { label: "Nome" }, /* @__PURE__ */ React.createElement(TextInput, { value: name, onChange: (e) => setName(e.target.value), placeholder: "Seu nome" })), /* @__PURE__ */ React.createElement(Field, { label: "Telefone / WhatsApp" }, /* @__PURE__ */ React.createElement(TextInput, { value: phone, onChange: (e) => setPhone(e.target.value), placeholder: "(86) 9 9999-9999" })), /* @__PURE__ */ React.createElement("div", { className: "flex gap-2 mb-2" }, /* @__PURE__ */ React.createElement(TextInput, { value: couponCode, onChange: (e) => setCouponCode(e.target.value), placeholder: "Cupom de desconto" }), /* @__PURE__ */ React.createElement("button", { onClick: applyCoupon, className: "px-4 text-xs", style: { border: `1px solid ${COLORS.gold}`, color: COLORS.gold } }, "Aplicar")), couponMsg && /* @__PURE__ */ React.createElement("p", { className: "text-xs mb-4", style: { color: appliedCoupon ? COLORS.gold : COLORS.red } }, couponMsg), /* @__PURE__ */ React.createElement("div", { className: "space-y-2 text-sm mt-5", style: { color: COLORS.creamSoft } }, /* @__PURE__ */ React.createElement("div", { className: "flex justify-between" }, /* @__PURE__ */ React.createElement("span", null, "Subtotal"), /* @__PURE__ */ React.createElement("span", null, "R$ ", brl(subtotal))), discount > 0 && /* @__PURE__ */ React.createElement("div", { className: "flex justify-between", style: { color: COLORS.gold } }, /* @__PURE__ */ React.createElement("span", null, "Desconto"), /* @__PURE__ */ React.createElement("span", null, "-R$ ", brl(discount))), /* @__PURE__ */ React.createElement("div", { className: "flex justify-between text-base pt-2", style: { borderTop: `1px solid ${COLORS.line}` } }, /* @__PURE__ */ React.createElement("span", null, "Total"), /* @__PURE__ */ React.createElement("span", null, "R$ ", brl(total)))), /* @__PURE__ */ React.createElement(
+      GoldButton,
+      {
+        className: "w-full mt-6",
+        icon: MessageCircle,
+        onClick: () => onCheckout({ items: detailed.map((it) => ({ productId: it.product.id, name: it.product.name, size: it.size, color: it.color, qty: it.qty, price: getDisplayPrice(it.product) })), subtotal, discount, total, name, phone })
+      },
+      "Finalizar pedido no WhatsApp"
+    ))));
+  }
+  function FavoritesPage({ favorites, products, onOpen, onToggleFav }) {
+    const list = products.filter((p) => favorites.includes(p.id));
+    return /* @__PURE__ */ React.createElement("div", { className: "px-6 md:px-16 py-10", style: { background: COLORS.creamSoft, minHeight: "60vh" } }, /* @__PURE__ */ React.createElement("h1", { style: { fontFamily: "'Fraunces', serif", fontSize: 28, color: COLORS.ink } }, "Favoritos"), list.length === 0 ? /* @__PURE__ */ React.createElement("p", { className: "mt-8 text-sm", style: { color: "#8A8377" } }, "Voc\xEA ainda n\xE3o favoritou nenhum produto.") : /* @__PURE__ */ React.createElement("div", { className: "mt-8 grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-8" }, list.map((p) => /* @__PURE__ */ React.createElement(ProductCard, { key: p.id, p, onOpen, isFav: true, onToggleFav }))));
+  }
+  function PublicFooter({ settings, onOpenAdmin }) {
+    const tapState = useRef({ count: 0, timer: null });
+    function handleSecretTap() {
+      tapState.current.count += 1;
+      if (tapState.current.timer) clearTimeout(tapState.current.timer);
+      if (tapState.current.count >= 5) {
+        tapState.current.count = 0;
+        onOpenAdmin();
+        return;
+      }
+      tapState.current.timer = setTimeout(() => {
+        tapState.current.count = 0;
+      }, 2500);
+    }
+    return /* @__PURE__ */ React.createElement("footer", { style: { background: COLORS.ink, borderTop: `1px solid ${COLORS.line}` }, className: "px-6 md:px-16 py-10 text-sm" }, /* @__PURE__ */ React.createElement("div", { className: "grid sm:grid-cols-2 gap-8" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Fraunces', serif", fontSize: 20, color: COLORS.creamSoft } }, settings.storeName), /* @__PURE__ */ React.createElement("p", { className: "mt-2", style: { color: "#8A8377" } }, settings.tagline)), /* @__PURE__ */ React.createElement("div", { style: { color: "#B7AF9E" } }, /* @__PURE__ */ React.createElement("p", { className: "flex items-center gap-2 mb-2" }, /* @__PURE__ */ React.createElement(MapPin, { size: 14 }), " ", settings.address), /* @__PURE__ */ React.createElement("a", { className: "flex items-center gap-2 mb-2 hover:text-white", href: `https://instagram.com/${settings.instagram.replace("@", "")}`, target: "_blank", rel: "noreferrer" }, /* @__PURE__ */ React.createElement(Instagram, { size: 14 }), " ", settings.instagram), /* @__PURE__ */ React.createElement("a", { className: "flex items-center gap-2 hover:text-white", href: waLink(settings.whatsapp, `Ol\xE1! Vim do site da ${settings.storeName}.`), target: "_blank", rel: "noreferrer" }, /* @__PURE__ */ React.createElement(MessageCircle, { size: 14 }), " ", settings.whatsappDisplay))), /* @__PURE__ */ React.createElement("p", { onClick: handleSecretTap, className: "mt-8 text-xs select-none", style: { color: "#4E483D" } }, "\xA9 ", (/* @__PURE__ */ new Date()).getFullYear(), " ", settings.storeName, ". Todos os direitos reservados."));
+  }
+  function WhatsAppFloat({ settings }) {
+    return /* @__PURE__ */ React.createElement(
+      "a",
+      {
+        href: waLink(settings.whatsapp, `Ol\xE1! Vim do site da ${settings.storeName} e gostaria de mais informa\xE7\xF5es.`),
+        target: "_blank",
+        rel: "noreferrer",
+        className: "fixed bottom-5 right-5 z-40 w-14 h-14 rounded-full flex items-center justify-center shadow-lg",
+        style: { background: "#25D366" },
+        "aria-label": "WhatsApp"
+      },
+      /* @__PURE__ */ React.createElement(MessageCircle, { size: 26, color: "#fff", fill: "#fff" })
+    );
+  }
+  function PublicSite({ db, cart, favorites, addToCart, updateCartQty, removeFromCart, toggleFavorite, checkout, openAdmin, toast }) {
+    const [page, setPage] = useState("home");
+    const [activeCategoryId, setActiveCategoryId] = useState(null);
+    const [activeProductId, setActiveProductId] = useState(null);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [promoOnly, setPromoOnly] = useState(false);
+    function goHome() {
+      setPage("home");
+      window.scrollTo(0, 0);
+    }
+    function goCategory(id) {
+      setActiveCategoryId(id);
+      setSearchQuery("");
+      setPromoOnly(false);
+      setPage("list");
+      window.scrollTo(0, 0);
+    }
+    function goPromo() {
+      setPromoOnly(true);
+      setActiveCategoryId(null);
+      setSearchQuery("");
+      setPage("list");
+      window.scrollTo(0, 0);
+    }
+    function goSearch(q) {
+      setSearchQuery(q);
+      setActiveCategoryId(null);
+      setPromoOnly(false);
+      setPage("list");
+      window.scrollTo(0, 0);
+    }
+    function goProduct(id) {
+      setActiveProductId(id);
+      setPage("product");
+      window.scrollTo(0, 0);
+    }
+    function goCart() {
+      setPage("cart");
+      window.scrollTo(0, 0);
+    }
+    function goFav() {
+      setPage("fav");
+      window.scrollTo(0, 0);
+    }
+    const activeProduct = db.products.find((p) => p.id === activeProductId);
+    const cartCount = cart.reduce((s, i) => s + i.qty, 0);
+    function handleAddToCart(product, size, color, qty) {
+      addToCart(product, size, color, qty);
+      toast(`${product.name} adicionado ao carrinho`);
+    }
+    function handleBuyNowWhatsapp(product, size, color, qty) {
+      const price = getDisplayPrice(product);
+      const items = [{ productId: product.id, name: product.name, size, color, qty, price }];
+      const total = price * qty;
+      checkout({ items, subtotal: total, discount: 0, total, name: "", phone: "" }, true);
+    }
+    return /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Manrope', sans-serif" } }, /* @__PURE__ */ React.createElement(
+      PublicHeader,
+      {
+        settings: db.settings,
+        categories: db.categories,
+        onNavHome: goHome,
+        onNavCategory: goCategory,
+        onNavPromo: goPromo,
+        onSearch: goSearch,
+        favCount: favorites.length,
+        cartCount,
+        onOpenCart: goCart,
+        onOpenFav: goFav,
+        onOpenAdmin: openAdmin
+      }
+    ), page === "home" && /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(Hero, { banners: db.banners, onCta: () => goCategory(null) }), /* @__PURE__ */ React.createElement(TrustStrip, null), /* @__PURE__ */ React.createElement(CategoryRail, { categories: db.categories, onPick: goCategory }), /* @__PURE__ */ React.createElement(ProductSection, { title: "Lan\xE7amentos", products: db.products.filter((p) => p.active && p.isNew), onOpen: goProduct, favorites, onToggleFav: toggleFavorite, onSeeAll: () => {
+      setActiveCategoryId(null);
+      setPromoOnly(false);
+      setSearchQuery("");
+      setPage("list");
+    } }), /* @__PURE__ */ React.createElement(ProductSection, { title: "Destaques", products: db.products.filter((p) => p.active && p.isFeatured), onOpen: goProduct, favorites, onToggleFav: toggleFavorite })), page === "list" && /* @__PURE__ */ React.createElement(
+      ProductListPage,
+      {
+        products: db.products,
+        categories: db.categories,
+        activeCategoryId,
+        searchQuery,
+        promoOnly,
+        onOpen: goProduct,
+        favorites,
+        onToggleFav: toggleFavorite
+      }
+    ), page === "product" && activeProduct && /* @__PURE__ */ React.createElement(
+      ProductDetailPage,
+      {
+        product: activeProduct,
+        settings: db.settings,
+        onAddToCart: handleAddToCart,
+        onBuyNowWhatsapp: handleBuyNowWhatsapp,
+        isFav: favorites.includes(activeProduct.id),
+        onToggleFav: toggleFavorite,
+        onBack: () => setPage(activeCategoryId || searchQuery || promoOnly ? "list" : "home")
+      }
+    ), page === "cart" && /* @__PURE__ */ React.createElement(
+      CartPage,
+      {
+        cart,
+        products: db.products,
+        coupons: db.coupons,
+        settings: db.settings,
+        onUpdateQty: updateCartQty,
+        onRemove: removeFromCart,
+        onCheckout: (data) => checkout(data, true),
+        onBack: goHome
+      }
+    ), page === "fav" && /* @__PURE__ */ React.createElement(FavoritesPage, { favorites, products: db.products, onOpen: goProduct, onToggleFav: toggleFavorite }), /* @__PURE__ */ React.createElement(PublicFooter, { settings: db.settings, onOpenAdmin: openAdmin }), /* @__PURE__ */ React.createElement(WhatsAppFloat, { settings: db.settings }));
+  }
+  function AdminLogin({ onLogin }) {
+    const [u, setU] = useState("");
+    const [p, setP] = useState("");
+    const [err, setErr] = useState("");
+    function submit() {
+      if (u === ADMIN_USER && p === ADMIN_PASS) onLogin();
+      else setErr("Usu\xE1rio ou senha inv\xE1lidos.");
+    }
+    return /* @__PURE__ */ React.createElement("div", { className: "min-h-screen flex items-center justify-center px-4", style: { background: COLORS.ink } }, /* @__PURE__ */ React.createElement("div", { className: "w-full max-w-sm p-8", style: { background: COLORS.inkSoft, border: `1px solid ${COLORS.line}` } }, /* @__PURE__ */ React.createElement("div", { className: "flex flex-col items-center mb-6" }, /* @__PURE__ */ React.createElement(Crown, { size: 20, color: COLORS.gold }), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Fraunces', serif", fontSize: 22, color: COLORS.creamSoft } }, "CL MODAS"), /* @__PURE__ */ React.createElement("span", { className: "text-xs mt-1", style: { color: "#8A8377" } }, "Painel administrativo")), /* @__PURE__ */ React.createElement(Field, { label: "Usu\xE1rio" }, /* @__PURE__ */ React.createElement(TextInput, { value: u, onChange: (e) => setU(e.target.value), onKeyDown: (e) => e.key === "Enter" && submit() })), /* @__PURE__ */ React.createElement(Field, { label: "Senha" }, /* @__PURE__ */ React.createElement(TextInput, { type: "password", value: p, onChange: (e) => setP(e.target.value), onKeyDown: (e) => e.key === "Enter" && submit() })), err && /* @__PURE__ */ React.createElement("p", { className: "text-xs mb-3", style: { color: COLORS.red } }, err), /* @__PURE__ */ React.createElement(GoldButton, { className: "w-full", onClick: submit }, "Entrar"), /* @__PURE__ */ React.createElement("p", { className: "text-xs mt-4 text-center", style: { color: "#6B6558" } }, "Acesso de demonstra\xE7\xE3o \u2014 usu\xE1rio: admin \xB7 senha: clmodas2026")));
+  }
+  const ADMIN_NAV = [
+    { key: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { key: "products", label: "Produtos", icon: Package },
+    { key: "categories", label: "Categorias", icon: Tag },
+    { key: "banners", label: "Banners", icon: LayoutGrid },
+    { key: "orders", label: "Pedidos", icon: ClipboardList },
+    { key: "clients", label: "Clientes", icon: Users },
+    { key: "coupons", label: "Cupons", icon: Ticket },
+    { key: "library", label: "Biblioteca de imagens", icon: ImageIcon },
+    { key: "settings", label: "Configura\xE7\xF5es", icon: SettingsIcon }
+  ];
+  function AdminShell({ page, setPage, onExit, onLogout, children }) {
+    const [navOpen, setNavOpen] = useState(false);
+    return /* @__PURE__ */ React.createElement("div", { className: "min-h-screen flex", style: { background: COLORS.ink, fontFamily: "'Manrope', sans-serif" } }, /* @__PURE__ */ React.createElement("aside", { className: "hidden md:flex flex-col w-60 flex-shrink-0 p-5", style: { borderRight: `1px solid ${COLORS.line}` } }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-2 mb-8" }, /* @__PURE__ */ React.createElement(Crown, { size: 16, color: COLORS.gold }), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Fraunces', serif", fontSize: 17, color: COLORS.creamSoft } }, "CL MODAS")), /* @__PURE__ */ React.createElement("nav", { className: "flex flex-col gap-1 flex-1" }, ADMIN_NAV.map((n) => /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        key: n.key,
+        onClick: () => setPage(n.key),
+        className: "flex items-center gap-2.5 px-3 py-2 text-sm text-left",
+        style: { background: page === n.key ? COLORS.charcoal : "transparent", color: page === n.key ? COLORS.gold : "#B7AF9E" }
+      },
+      /* @__PURE__ */ React.createElement(n.icon, { size: 16 }),
+      " ",
+      n.label
+    ))), /* @__PURE__ */ React.createElement("button", { onClick: onExit, className: "flex items-center gap-2.5 px-3 py-2 text-sm mt-2", style: { color: "#B7AF9E" } }, /* @__PURE__ */ React.createElement(ExternalLink, { size: 16 }), " Ver site"), /* @__PURE__ */ React.createElement("button", { onClick: onLogout, className: "flex items-center gap-2.5 px-3 py-2 text-sm", style: { color: "#B7AF9E" } }, /* @__PURE__ */ React.createElement(LogOut, { size: 16 }), " Sair")), /* @__PURE__ */ React.createElement("div", { className: "flex-1 min-w-0" }, /* @__PURE__ */ React.createElement("div", { className: "md:hidden flex items-center justify-between px-4 py-3", style: { borderBottom: `1px solid ${COLORS.line}` } }, /* @__PURE__ */ React.createElement("button", { onClick: () => setNavOpen(true) }, /* @__PURE__ */ React.createElement(Menu, { size: 20, color: COLORS.creamSoft })), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Fraunces', serif", color: COLORS.creamSoft } }, "CL MODAS \xB7 Admin"), /* @__PURE__ */ React.createElement("button", { onClick: onExit }, /* @__PURE__ */ React.createElement(ExternalLink, { size: 18, color: COLORS.creamSoft }))), navOpen && /* @__PURE__ */ React.createElement("div", { className: "fixed inset-0 z-50 flex md:hidden", onClick: () => setNavOpen(false) }, /* @__PURE__ */ React.createElement("div", { className: "w-64 h-full p-5", style: { background: COLORS.inkSoft }, onClick: (e) => e.stopPropagation() }, /* @__PURE__ */ React.createElement("button", { onClick: () => setNavOpen(false), className: "mb-6" }, /* @__PURE__ */ React.createElement(X, { size: 20, color: COLORS.creamSoft })), /* @__PURE__ */ React.createElement("nav", { className: "flex flex-col gap-1" }, ADMIN_NAV.map((n) => /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        key: n.key,
+        onClick: () => {
+          setPage(n.key);
+          setNavOpen(false);
+        },
+        className: "flex items-center gap-2.5 px-3 py-2.5 text-sm text-left",
+        style: { background: page === n.key ? COLORS.charcoal : "transparent", color: page === n.key ? COLORS.gold : "#B7AF9E" }
+      },
+      /* @__PURE__ */ React.createElement(n.icon, { size: 16 }),
+      " ",
+      n.label
+    )), /* @__PURE__ */ React.createElement("button", { onClick: onLogout, className: "flex items-center gap-2.5 px-3 py-2.5 text-sm mt-2", style: { color: "#B7AF9E" } }, /* @__PURE__ */ React.createElement(LogOut, { size: 16 }), " Sair"))), /* @__PURE__ */ React.createElement("div", { className: "flex-1" })), /* @__PURE__ */ React.createElement("main", { className: "p-5 md:p-8" }, children)));
+  }
+  function StatCard({ label, value, sub }) {
+    return /* @__PURE__ */ React.createElement("div", { className: "p-5", style: { background: COLORS.inkSoft, border: `1px solid ${COLORS.line}` } }, /* @__PURE__ */ React.createElement("p", { className: "text-xs", style: { color: "#8A8377" } }, label), /* @__PURE__ */ React.createElement("p", { className: "text-2xl mt-1", style: { fontFamily: "'Fraunces', serif", color: COLORS.creamSoft } }, value), sub && /* @__PURE__ */ React.createElement("p", { className: "text-xs mt-1", style: { color: COLORS.gold } }, sub));
+  }
+  function AdminDashboard({ db }) {
+    const totalSales = db.orders.filter((o) => o.status !== "Cancelado").reduce((s, o) => s + o.total, 0);
+    const uniqueClients = new Set(db.orders.map((o) => o.phone)).size;
+    const stockValue = db.products.filter((p) => p.active).reduce((s, p) => s + getDisplayPrice(p) * getTotalStock(p), 0);
+    const last7 = useMemo(() => {
+      const arr = [];
+      for (let i = 6; i >= 0; i--) {
+        const iso = daysAgoISO(i);
+        const total = db.orders.filter((o) => o.date === iso).reduce((s, o) => s + o.total, 0);
+        arr.push({ day: fmtDate(iso), total: Number(total.toFixed(2)) });
+      }
+      return arr;
+    }, [db.orders]);
+    const recent = [...db.orders].sort((a, b) => a.date < b.date ? 1 : -1).slice(0, 5);
+    return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h1", { style: { fontFamily: "'Fraunces', serif", fontSize: 24, color: COLORS.creamSoft } }, "Dashboard"), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-2 lg:grid-cols-5 gap-4 mt-6" }, /* @__PURE__ */ React.createElement(StatCard, { label: "Vendas (total)", value: `R$ ${brl(totalSales)}` }), /* @__PURE__ */ React.createElement(StatCard, { label: "Pedidos", value: db.orders.length }), /* @__PURE__ */ React.createElement(StatCard, { label: "Produtos", value: db.products.length, sub: `${db.products.filter((p) => p.active).length} ativos` }), /* @__PURE__ */ React.createElement(StatCard, { label: "Valor em estoque", value: `R$ ${brl(stockValue)}`, sub: "pre\xE7o \xD7 qtd. de cada produto" }), /* @__PURE__ */ React.createElement(StatCard, { label: "Clientes", value: uniqueClients })), /* @__PURE__ */ React.createElement("div", { className: "grid lg:grid-cols-3 gap-6 mt-6" }, /* @__PURE__ */ React.createElement("div", { className: "lg:col-span-2 p-5", style: { background: COLORS.inkSoft, border: `1px solid ${COLORS.line}` } }, /* @__PURE__ */ React.createElement("p", { className: "text-sm mb-4", style: { color: COLORS.creamSoft } }, "Vendas dos \xFAltimos 7 dias"), /* @__PURE__ */ React.createElement("div", { style: { width: "100%", height: 220 } }, /* @__PURE__ */ React.createElement(SimpleLineChart, { data: last7, height: 220 }))), /* @__PURE__ */ React.createElement("div", { className: "p-5", style: { background: COLORS.inkSoft, border: `1px solid ${COLORS.line}` } }, /* @__PURE__ */ React.createElement("p", { className: "text-sm mb-4", style: { color: COLORS.creamSoft } }, "Pedidos recentes"), /* @__PURE__ */ React.createElement("div", { className: "space-y-3" }, recent.map((o) => /* @__PURE__ */ React.createElement("div", { key: o.id, className: "flex items-center justify-between text-sm" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { style: { color: COLORS.creamSoft } }, "#", o.id), /* @__PURE__ */ React.createElement("p", { className: "text-xs", style: { color: "#8A8377" } }, o.customerName)), /* @__PURE__ */ React.createElement(StatusPill, { status: o.status })))))));
+  }
+  function Th({ children }) {
+    return /* @__PURE__ */ React.createElement("th", { className: "text-left text-xs font-normal px-3 py-2.5", style: { color: "#8A8377" } }, children);
+  }
+  function Td({ children, className }) {
+    return /* @__PURE__ */ React.createElement("td", { className: `px-3 py-2.5 text-sm ${className || ""}`, style: { color: COLORS.creamSoft } }, children);
+  }
+  function AdminProducts({ db, updateDb, openImagePicker, toast }) {
+    const [editing, setEditing] = useState(null);
+    function startNew() {
+      setEditing({
+        id: uid("prod"),
+        name: "",
+        categoryId: db.categories[0]?.id || "",
+        description: "",
+        price: 0,
+        promoPrice: null,
+        active: true,
+        isNew: true,
+        isFeatured: false,
+        images: [],
+        variantType: "sizeColor",
+        variants: [],
+        stock: 0
+      });
+    }
+    function save(p) {
+      updateDb((d) => {
+        const exists = d.products.some((x) => x.id === p.id);
+        const products = exists ? d.products.map((x) => x.id === p.id ? p : x) : [...d.products, p];
+        return { ...d, products };
+      });
+      setEditing(null);
+      toast("Produto salvo");
+    }
+    function remove(id) {
+      if (!confirm("Excluir este produto?")) return;
+      updateDb((d) => ({ ...d, products: d.products.filter((x) => x.id !== id) }));
+      toast("Produto exclu\xEDdo");
+    }
+    function duplicate(p) {
+      const copy = { ...p, id: uid("prod"), name: p.name + " (c\xF3pia)" };
+      updateDb((d) => ({ ...d, products: [...d.products, copy] }));
+      toast("Produto duplicado");
+    }
+    if (editing) {
+      return /* @__PURE__ */ React.createElement(ProductForm, { product: editing, categories: db.categories, onCancel: () => setEditing(null), onSave: save, openImagePicker });
+    }
+    return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React.createElement("h1", { style: { fontFamily: "'Fraunces', serif", fontSize: 24, color: COLORS.creamSoft } }, "Produtos"), /* @__PURE__ */ React.createElement(GoldButton, { onClick: startNew, icon: Plus }, "Adicionar produto")), /* @__PURE__ */ React.createElement("div", { className: "mt-6 overflow-x-auto", style: { border: `1px solid ${COLORS.line}` } }, /* @__PURE__ */ React.createElement("table", { className: "w-full", style: { minWidth: 720 } }, /* @__PURE__ */ React.createElement("thead", { style: { borderBottom: `1px solid ${COLORS.line}` } }, /* @__PURE__ */ React.createElement("tr", null, /* @__PURE__ */ React.createElement(Th, null), /* @__PURE__ */ React.createElement(Th, null, "Produto"), /* @__PURE__ */ React.createElement(Th, null, "Categoria"), /* @__PURE__ */ React.createElement(Th, null, "Pre\xE7o"), /* @__PURE__ */ React.createElement(Th, null, "Estoque"), /* @__PURE__ */ React.createElement(Th, null, "Status"), /* @__PURE__ */ React.createElement(Th, null, "A\xE7\xF5es"))), /* @__PURE__ */ React.createElement("tbody", null, db.products.map((p) => {
+      const cat = db.categories.find((c) => c.id === p.categoryId);
+      const stock = getTotalStock(p);
+      return /* @__PURE__ */ React.createElement("tr", { key: p.id, style: { borderBottom: `1px solid ${COLORS.line}` } }, /* @__PURE__ */ React.createElement(Td, null, /* @__PURE__ */ React.createElement("img", { src: p.images[0], className: "w-10 h-12 object-cover" })), /* @__PURE__ */ React.createElement(Td, null, p.name), /* @__PURE__ */ React.createElement(Td, null, cat?.name || "-"), /* @__PURE__ */ React.createElement(Td, null, p.promoPrice ? /* @__PURE__ */ React.createElement("span", null, "R$ ", brl(p.promoPrice), " ", /* @__PURE__ */ React.createElement("span", { className: "line-through text-xs", style: { color: "#6B6558" } }, "R$ ", brl(p.price))) : `R$ ${brl(p.price)}`), /* @__PURE__ */ React.createElement(Td, null, stock <= 0 ? /* @__PURE__ */ React.createElement("span", { style: { color: COLORS.red } }, "Esgotado") : stock), /* @__PURE__ */ React.createElement(Td, null, p.active ? /* @__PURE__ */ React.createElement("span", { style: { color: COLORS.green } }, "Ativo") : /* @__PURE__ */ React.createElement("span", { style: { color: "#8A8377" } }, "Inativo")), /* @__PURE__ */ React.createElement(Td, null, /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-3" }, /* @__PURE__ */ React.createElement("button", { onClick: () => setEditing(p), "aria-label": "Editar" }, /* @__PURE__ */ React.createElement(Pencil, { size: 15, color: COLORS.gold })), /* @__PURE__ */ React.createElement("button", { onClick: () => duplicate(p), "aria-label": "Duplicar" }, /* @__PURE__ */ React.createElement(Copy, { size: 15, color: "#B7AF9E" })), /* @__PURE__ */ React.createElement("button", { onClick: () => remove(p.id), "aria-label": "Excluir" }, /* @__PURE__ */ React.createElement(Trash2, { size: 15, color: COLORS.red })))));
+    })))));
+  }
+  function ProductForm({ product, categories, onCancel, onSave, openImagePicker }) {
+    const [form, setForm] = useState(product);
+    function set(k, v) {
+      setForm((f) => ({ ...f, [k]: v }));
+    }
+    function addVariantRow() {
+      set("variants", [...form.variants, { size: "", color: "", hex: "#111111", stock: 0 }]);
+    }
+    function updateVariantRow(i, patch) {
+      const v = [...form.variants];
+      v[i] = { ...v[i], ...patch };
+      set("variants", v);
+    }
+    function removeVariantRow(i) {
+      set("variants", form.variants.filter((_, idx) => idx !== i));
+    }
+    function addImageUrl(url) {
+      if (url) set("images", [...form.images, url]);
+    }
+    function addImagesFromUpload(results) {
+      set("images", [...form.images, ...results.map((r) => r.dataUrl)]);
+    }
+    function removeImage(i) {
+      set("images", form.images.filter((_, idx) => idx !== i));
+    }
+    function setCoverImage(i) {
+      if (i === 0) return;
+      const imgs = [...form.images];
+      const [chosen] = imgs.splice(i, 1);
+      imgs.unshift(chosen);
+      set("images", imgs);
+    }
+    const [urlDraft, setUrlDraft] = useState("");
+    return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between mb-6" }, /* @__PURE__ */ React.createElement("h1", { style: { fontFamily: "'Fraunces', serif", fontSize: 22, color: COLORS.creamSoft } }, product.name ? "Editar produto" : "Adicionar produto"), /* @__PURE__ */ React.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React.createElement("button", { onClick: onCancel, className: "px-4 py-2 text-sm", style: { border: `1px solid ${COLORS.line}`, color: COLORS.creamSoft } }, "Cancelar"), /* @__PURE__ */ React.createElement(GoldButton, { onClick: () => onSave(form) }, "Salvar produto"))), /* @__PURE__ */ React.createElement("div", { className: "grid lg:grid-cols-3 gap-8" }, /* @__PURE__ */ React.createElement("div", { className: "lg:col-span-2 space-y-1" }, /* @__PURE__ */ React.createElement(Field, { label: "Nome do produto" }, /* @__PURE__ */ React.createElement(TextInput, { value: form.name, onChange: (e) => set("name", e.target.value), placeholder: "Ex: Polo Premium" })), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-2 gap-4" }, /* @__PURE__ */ React.createElement(Field, { label: "Categoria" }, /* @__PURE__ */ React.createElement(SelectInput, { value: form.categoryId, onChange: (e) => set("categoryId", e.target.value) }, categories.map((c) => /* @__PURE__ */ React.createElement("option", { key: c.id, value: c.id }, c.name)))), /* @__PURE__ */ React.createElement("div", { className: "flex items-end gap-4 pb-4" }, /* @__PURE__ */ React.createElement(Checkbox, { checked: form.active, onChange: (v) => set("active", v), label: "Ativo" }))), /* @__PURE__ */ React.createElement(Field, { label: "Descri\xE7\xE3o" }, /* @__PURE__ */ React.createElement(TextArea, { rows: 4, value: form.description, onChange: (e) => set("description", e.target.value), placeholder: "Descri\xE7\xE3o do produto..." })), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-2 gap-4" }, /* @__PURE__ */ React.createElement(Field, { label: "Pre\xE7o (R$)" }, /* @__PURE__ */ React.createElement(TextInput, { type: "number", step: "0.01", value: form.price, onChange: (e) => set("price", Number(e.target.value)) })), /* @__PURE__ */ React.createElement(Field, { label: "Pre\xE7o promocional (R$)" }, /* @__PURE__ */ React.createElement(TextInput, { type: "number", step: "0.01", value: form.promoPrice ?? "", onChange: (e) => set("promoPrice", e.target.value === "" ? null : Number(e.target.value)), placeholder: "Opcional" }))), /* @__PURE__ */ React.createElement("div", { className: "flex gap-6 mb-2" }, /* @__PURE__ */ React.createElement(Checkbox, { checked: form.isNew, onChange: (v) => set("isNew", v), label: "Marcar como lan\xE7amento" }), /* @__PURE__ */ React.createElement(Checkbox, { checked: form.isFeatured, onChange: (v) => set("isFeatured", v), label: "Exibir em destaque" })), /* @__PURE__ */ React.createElement("div", { className: "mt-4 pt-4", style: { borderTop: `1px solid ${COLORS.line}` } }, /* @__PURE__ */ React.createElement("p", { className: "text-sm mb-3", style: { color: COLORS.creamSoft } }, "Tamanhos, cores e estoque"), /* @__PURE__ */ React.createElement("div", { className: "flex gap-4 mb-4" }, /* @__PURE__ */ React.createElement("label", { className: "flex items-center gap-2 text-xs cursor-pointer", style: { color: COLORS.creamSoft } }, /* @__PURE__ */ React.createElement("input", { type: "radio", checked: form.variantType === "sizeColor", onChange: () => set("variantType", "sizeColor") }), " Com tamanho e cor"), /* @__PURE__ */ React.createElement("label", { className: "flex items-center gap-2 text-xs cursor-pointer", style: { color: COLORS.creamSoft } }, /* @__PURE__ */ React.createElement("input", { type: "radio", checked: form.variantType === "simple", onChange: () => set("variantType", "simple") }), " Produto simples (sem varia\xE7\xE3o)")), form.variantType === "simple" ? /* @__PURE__ */ React.createElement(Field, { label: "Estoque" }, /* @__PURE__ */ React.createElement(TextInput, { type: "number", value: form.stock ?? 0, onChange: (e) => set("stock", Number(e.target.value)) })) : /* @__PURE__ */ React.createElement("div", { className: "space-y-2" }, form.variants.map((v, i) => /* @__PURE__ */ React.createElement("div", { key: i, className: "flex items-center gap-2 flex-wrap" }, /* @__PURE__ */ React.createElement(TextInput, { className: "!w-20", value: v.size, onChange: (e) => updateVariantRow(i, { size: e.target.value }), placeholder: "Tam." }), /* @__PURE__ */ React.createElement(TextInput, { className: "!w-28", value: v.color, onChange: (e) => updateVariantRow(i, { color: e.target.value }), placeholder: "Cor" }), /* @__PURE__ */ React.createElement("input", { type: "color", value: v.hex, onChange: (e) => updateVariantRow(i, { hex: e.target.value }), className: "w-9 h-9 p-0 border-0" }), /* @__PURE__ */ React.createElement(TextInput, { type: "number", className: "!w-20", value: v.stock, onChange: (e) => updateVariantRow(i, { stock: Number(e.target.value) }), placeholder: "Estoque" }), /* @__PURE__ */ React.createElement("button", { onClick: () => removeVariantRow(i) }, /* @__PURE__ */ React.createElement(Trash2, { size: 15, color: COLORS.red })))), /* @__PURE__ */ React.createElement("button", { onClick: addVariantRow, className: "text-xs flex items-center gap-1 mt-2", style: { color: COLORS.gold } }, /* @__PURE__ */ React.createElement(Plus, { size: 13 }), " Nova varia\xE7\xE3o")))), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { className: "text-sm mb-1", style: { color: COLORS.creamSoft } }, "Imagens do produto"), /* @__PURE__ */ React.createElement("p", { className: "text-xs mb-3", style: { color: "#8A8377" } }, "A primeira foto \xE9 a que aparece na loja. Toque na estrela para tornar outra foto a principal."), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-3 gap-2 mb-3" }, form.images.map((im, i) => /* @__PURE__ */ React.createElement("div", { key: i, className: "relative aspect-square" }, /* @__PURE__ */ React.createElement("img", { src: im, className: "w-full h-full object-cover" }), i === 0 ? /* @__PURE__ */ React.createElement("span", { className: "absolute bottom-1 left-1 px-1.5 py-0.5", style: { background: COLORS.gold, color: COLORS.ink, fontSize: "9px" } }, "CAPA") : /* @__PURE__ */ React.createElement("button", { onClick: () => setCoverImage(i), "aria-label": "Tornar capa", className: "absolute bottom-1 left-1 w-5 h-5 rounded-full flex items-center justify-center", style: { background: "rgba(19,17,16,0.75)" } }, /* @__PURE__ */ React.createElement(Star, { size: 11, color: COLORS.gold })), /* @__PURE__ */ React.createElement("button", { onClick: () => removeImage(i), className: "absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full flex items-center justify-center", style: { background: COLORS.red } }, /* @__PURE__ */ React.createElement(X, { size: 11, color: "#fff" }))))), /* @__PURE__ */ React.createElement(FileUploadButton, { onImages: addImagesFromUpload, multiple: true, label: "Enviar foto do celular", className: "mb-2" }), /* @__PURE__ */ React.createElement("button", { onClick: () => openImagePicker((url) => addImageUrl(url)), className: "w-full flex items-center justify-center gap-2 py-3 text-sm mb-2", style: { border: `1px dashed ${COLORS.line}`, color: "#B7AF9E" } }, /* @__PURE__ */ React.createElement(ImageIcon, { size: 15 }), " Escolher da biblioteca"), /* @__PURE__ */ React.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React.createElement(TextInput, { value: urlDraft, onChange: (e) => setUrlDraft(e.target.value), placeholder: "Colar URL da imagem" }), /* @__PURE__ */ React.createElement("button", { onClick: () => {
+      addImageUrl(urlDraft);
+      setUrlDraft("");
+    }, className: "px-3", style: { border: `1px solid ${COLORS.line}` } }, /* @__PURE__ */ React.createElement(LinkIcon, { size: 15, color: "#B7AF9E" }))))));
+  }
+  function SimpleCrud({ title, items, fields, onAdd, onEdit, onDelete, columns, openImagePicker }) {
+    const [editing, setEditing] = useState(null);
+    function blank() {
+      const o = {};
+      fields.forEach((f) => {
+        o[f.key] = f.type === "checkbox" ? true : f.type === "number" ? 0 : "";
+      });
+      o.id = uid("item");
+      return o;
+    }
+    return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React.createElement("h1", { style: { fontFamily: "'Fraunces', serif", fontSize: 24, color: COLORS.creamSoft } }, title), /* @__PURE__ */ React.createElement(GoldButton, { onClick: () => setEditing(blank()), icon: Plus }, "Adicionar")), /* @__PURE__ */ React.createElement("div", { className: "mt-6 overflow-x-auto", style: { border: `1px solid ${COLORS.line}` } }, /* @__PURE__ */ React.createElement("table", { className: "w-full", style: { minWidth: 520 } }, /* @__PURE__ */ React.createElement("thead", { style: { borderBottom: `1px solid ${COLORS.line}` } }, /* @__PURE__ */ React.createElement("tr", null, columns.map((c) => /* @__PURE__ */ React.createElement(Th, { key: c.key }, c.label)), /* @__PURE__ */ React.createElement(Th, null, "A\xE7\xF5es"))), /* @__PURE__ */ React.createElement("tbody", null, items.map((it) => /* @__PURE__ */ React.createElement("tr", { key: it.id, style: { borderBottom: `1px solid ${COLORS.line}` } }, columns.map((c) => /* @__PURE__ */ React.createElement(Td, { key: c.key }, c.render ? c.render(it) : String(it[c.key] ?? ""))), /* @__PURE__ */ React.createElement(Td, null, /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-3" }, /* @__PURE__ */ React.createElement("button", { onClick: () => setEditing(it) }, /* @__PURE__ */ React.createElement(Pencil, { size: 15, color: COLORS.gold })), /* @__PURE__ */ React.createElement("button", { onClick: () => {
+      if (confirm("Excluir este item?")) onDelete(it.id);
+    } }, /* @__PURE__ */ React.createElement(Trash2, { size: 15, color: COLORS.red }))))))))), editing && /* @__PURE__ */ React.createElement(Modal, { title: items.some((x) => x.id === editing.id) ? "Editar" : "Adicionar", onClose: () => setEditing(null) }, /* @__PURE__ */ React.createElement(
+      CrudForm,
+      {
+        fields,
+        initial: editing,
+        openImagePicker,
+        onSave: (val) => {
+          items.some((x) => x.id === val.id) ? onEdit(val) : onAdd(val);
+          setEditing(null);
+        }
+      }
+    )));
+  }
+  function CrudForm({ fields, initial, onSave, openImagePicker }) {
+    const [form, setForm] = useState(initial);
+    function set(k, v) {
+      setForm((f) => ({ ...f, [k]: v }));
+    }
+    return /* @__PURE__ */ React.createElement("div", null, fields.map((f) => /* @__PURE__ */ React.createElement(Field, { key: f.key, label: f.label }, f.type === "text" && /* @__PURE__ */ React.createElement(TextInput, { value: form[f.key], onChange: (e) => set(f.key, e.target.value) }), f.type === "number" && /* @__PURE__ */ React.createElement(TextInput, { type: "number", step: "0.01", value: form[f.key], onChange: (e) => set(f.key, Number(e.target.value)) }), f.type === "textarea" && /* @__PURE__ */ React.createElement(TextArea, { rows: 3, value: form[f.key], onChange: (e) => set(f.key, e.target.value) }), f.type === "checkbox" && /* @__PURE__ */ React.createElement(Checkbox, { checked: !!form[f.key], onChange: (v) => set(f.key, v), label: f.checkLabel || "Ativo" }), f.type === "image" && /* @__PURE__ */ React.createElement("div", null, form[f.key] && /* @__PURE__ */ React.createElement("img", { src: form[f.key], className: "w-24 h-24 object-cover mb-2" }), /* @__PURE__ */ React.createElement(FileUploadButton, { className: "mb-2 !py-2 text-xs", label: "Enviar do celular", onImages: (results) => set(f.key, results[0].dataUrl) }), /* @__PURE__ */ React.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React.createElement("button", { onClick: () => openImagePicker((url) => set(f.key, url)), className: "px-3 py-2 text-xs flex items-center gap-1.5", style: { border: `1px dashed ${COLORS.line}`, color: "#B7AF9E" } }, /* @__PURE__ */ React.createElement(ImageIcon, { size: 13 }), " Biblioteca"), /* @__PURE__ */ React.createElement(TextInput, { value: form[f.key], onChange: (e) => set(f.key, e.target.value), placeholder: "ou colar URL" }))))), /* @__PURE__ */ React.createElement(GoldButton, { className: "w-full mt-2", onClick: () => onSave(form) }, "Salvar"));
+  }
+  function AdminOrders({ db, updateDb }) {
+    const [viewing, setViewing] = useState(null);
+    function setStatus(id, status) {
+      updateDb((d) => ({ ...d, orders: d.orders.map((o) => o.id === id ? { ...o, status } : o) }));
+    }
+    return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h1", { style: { fontFamily: "'Fraunces', serif", fontSize: 24, color: COLORS.creamSoft } }, "Pedidos"), /* @__PURE__ */ React.createElement("div", { className: "mt-6 overflow-x-auto", style: { border: `1px solid ${COLORS.line}` } }, /* @__PURE__ */ React.createElement("table", { className: "w-full", style: { minWidth: 720 } }, /* @__PURE__ */ React.createElement("thead", { style: { borderBottom: `1px solid ${COLORS.line}` } }, /* @__PURE__ */ React.createElement("tr", null, /* @__PURE__ */ React.createElement(Th, null, "Pedido"), /* @__PURE__ */ React.createElement(Th, null, "Cliente"), /* @__PURE__ */ React.createElement(Th, null, "Telefone"), /* @__PURE__ */ React.createElement(Th, null, "Total"), /* @__PURE__ */ React.createElement(Th, null, "Data"), /* @__PURE__ */ React.createElement(Th, null, "Status"), /* @__PURE__ */ React.createElement(Th, null, "A\xE7\xF5es"))), /* @__PURE__ */ React.createElement("tbody", null, [...db.orders].sort((a, b) => a.date < b.date ? 1 : -1).map((o) => /* @__PURE__ */ React.createElement("tr", { key: o.id, style: { borderBottom: `1px solid ${COLORS.line}` } }, /* @__PURE__ */ React.createElement(Td, null, "#", o.id), /* @__PURE__ */ React.createElement(Td, null, o.customerName), /* @__PURE__ */ React.createElement(Td, null, o.phone), /* @__PURE__ */ React.createElement(Td, null, "R$ ", brl(o.total)), /* @__PURE__ */ React.createElement(Td, null, fmtDateFull(o.date)), /* @__PURE__ */ React.createElement(Td, null, /* @__PURE__ */ React.createElement("select", { value: o.status, onChange: (e) => setStatus(o.id, e.target.value), className: "text-xs px-2 py-1 outline-none", style: { background: COLORS.inkSoft, border: `1px solid ${COLORS.line}`, color: COLORS.creamSoft } }, STATUS_FLOW.map((s) => /* @__PURE__ */ React.createElement("option", { key: s, value: s }, s)))), /* @__PURE__ */ React.createElement(Td, null, /* @__PURE__ */ React.createElement("button", { onClick: () => setViewing(o), className: "text-xs", style: { color: COLORS.gold } }, "Ver detalhes"))))))), viewing && /* @__PURE__ */ React.createElement(Modal, { title: `Pedido #${viewing.id}`, onClose: () => setViewing(null) }, /* @__PURE__ */ React.createElement("p", { className: "text-sm mb-1", style: { color: COLORS.creamSoft } }, viewing.customerName, " \xB7 ", viewing.phone), /* @__PURE__ */ React.createElement("p", { className: "text-xs mb-4", style: { color: "#8A8377" } }, fmtDateFull(viewing.date)), /* @__PURE__ */ React.createElement("div", { className: "space-y-2 mb-4" }, viewing.items.map((it, i) => /* @__PURE__ */ React.createElement("div", { key: i, className: "flex justify-between text-sm", style: { color: COLORS.creamSoft } }, /* @__PURE__ */ React.createElement("span", null, it.qty, "x ", it.name, " ", it.size !== "\xDAnico" ? `(${it.size}${it.color !== "-" ? ", " + it.color : ""})` : ""), /* @__PURE__ */ React.createElement("span", null, "R$ ", brl(it.price * it.qty))))), /* @__PURE__ */ React.createElement("div", { className: "flex justify-between text-base pt-3", style: { borderTop: `1px solid ${COLORS.line}`, color: COLORS.gold } }, /* @__PURE__ */ React.createElement("span", null, "Total"), /* @__PURE__ */ React.createElement("span", null, "R$ ", brl(viewing.total)))));
+  }
+  function AdminClients({ db }) {
+    const [viewing, setViewing] = useState(null);
+    const clients = useMemo(() => {
+      const map = /* @__PURE__ */ new Map();
+      db.orders.forEach((o) => {
+        const cur = map.get(o.phone) || { name: o.customerName, phone: o.phone, orders: [], total: 0 };
+        cur.orders.push(o);
+        cur.total += o.total;
+        cur.name = o.customerName;
+        map.set(o.phone, cur);
+      });
+      return [...map.values()].sort((a, b) => b.total - a.total);
+    }, [db.orders]);
+    return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h1", { style: { fontFamily: "'Fraunces', serif", fontSize: 24, color: COLORS.creamSoft } }, "Clientes"), /* @__PURE__ */ React.createElement("div", { className: "mt-6 overflow-x-auto", style: { border: `1px solid ${COLORS.line}` } }, /* @__PURE__ */ React.createElement("table", { className: "w-full", style: { minWidth: 520 } }, /* @__PURE__ */ React.createElement("thead", { style: { borderBottom: `1px solid ${COLORS.line}` } }, /* @__PURE__ */ React.createElement("tr", null, /* @__PURE__ */ React.createElement(Th, null, "Nome"), /* @__PURE__ */ React.createElement(Th, null, "Telefone"), /* @__PURE__ */ React.createElement(Th, null, "Pedidos"), /* @__PURE__ */ React.createElement(Th, null, "Total gasto"), /* @__PURE__ */ React.createElement(Th, null))), /* @__PURE__ */ React.createElement("tbody", null, clients.map((c) => /* @__PURE__ */ React.createElement("tr", { key: c.phone, style: { borderBottom: `1px solid ${COLORS.line}` } }, /* @__PURE__ */ React.createElement(Td, null, c.name), /* @__PURE__ */ React.createElement(Td, null, c.phone), /* @__PURE__ */ React.createElement(Td, null, c.orders.length), /* @__PURE__ */ React.createElement(Td, null, "R$ ", brl(c.total)), /* @__PURE__ */ React.createElement(Td, null, /* @__PURE__ */ React.createElement("button", { onClick: () => setViewing(c), className: "text-xs", style: { color: COLORS.gold } }, "Hist\xF3rico"))))))), viewing && /* @__PURE__ */ React.createElement(Modal, { title: viewing.name, onClose: () => setViewing(null) }, /* @__PURE__ */ React.createElement("div", { className: "space-y-3" }, viewing.orders.map((o) => /* @__PURE__ */ React.createElement("div", { key: o.id, className: "flex items-center justify-between text-sm", style: { color: COLORS.creamSoft } }, /* @__PURE__ */ React.createElement("span", null, "#", o.id, " \xB7 ", fmtDate(o.date)), /* @__PURE__ */ React.createElement("span", null, "R$ ", brl(o.total)), /* @__PURE__ */ React.createElement(StatusPill, { status: o.status }))))));
+  }
+  function AdminLibrary({ db, updateDb, toast }) {
+    const [q, setQ] = useState("");
+    const [name, setName] = useState("");
+    const [url, setUrl] = useState("");
+    const [tags, setTags] = useState("");
+    const filtered = db.imageLibrary.filter((i) => (i.name + " " + i.tags).toLowerCase().includes(q.toLowerCase()));
+    function add() {
+      if (!url) return;
+      updateDb((d) => ({ ...d, imageLibrary: [...d.imageLibrary, { id: uid("lib"), name: name || "Sem nome", url, tags }] }));
+      setName("");
+      setUrl("");
+      setTags("");
+      toast("Imagem adicionada \xE0 biblioteca");
+    }
+    function addFromUpload(results) {
+      updateDb((d) => ({ ...d, imageLibrary: [...d.imageLibrary, ...results.map((r) => ({ id: uid("lib"), name: r.name || "Foto enviada", url: r.dataUrl, tags: "" }))] }));
+      toast(results.length > 1 ? "Fotos adicionadas \xE0 biblioteca" : "Foto adicionada \xE0 biblioteca");
+    }
+    function remove(id) {
+      if (!confirm("Remover esta imagem da biblioteca?")) return;
+      updateDb((d) => ({ ...d, imageLibrary: d.imageLibrary.filter((i) => i.id !== id) }));
+    }
+    return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h1", { style: { fontFamily: "'Fraunces', serif", fontSize: 24, color: COLORS.creamSoft } }, "Biblioteca de imagens"), /* @__PURE__ */ React.createElement("p", { className: "text-xs mt-1 mb-5", style: { color: "#8A8377" } }, db.imageLibrary.length, " imagens \xB7 preparada para armazenar milhares de fotos reutiliz\xE1veis em produtos e banners."), /* @__PURE__ */ React.createElement("div", { className: "p-4 mb-6", style: { background: COLORS.inkSoft, border: `1px solid ${COLORS.line}` } }, /* @__PURE__ */ React.createElement("p", { className: "text-sm mb-3", style: { color: COLORS.creamSoft } }, "Enviar fotos do celular ou computador"), /* @__PURE__ */ React.createElement(FileUploadButton, { onImages: addFromUpload, multiple: true, className: "mb-5" }), /* @__PURE__ */ React.createElement("p", { className: "text-sm mb-3", style: { color: COLORS.creamSoft } }, "Ou adicionar por URL"), /* @__PURE__ */ React.createElement("div", { className: "grid sm:grid-cols-3 gap-3" }, /* @__PURE__ */ React.createElement(TextInput, { placeholder: "Nome", value: name, onChange: (e) => setName(e.target.value) }), /* @__PURE__ */ React.createElement(TextInput, { placeholder: "URL da imagem", value: url, onChange: (e) => setUrl(e.target.value) }), /* @__PURE__ */ React.createElement(TextInput, { placeholder: "Tags (separadas por espa\xE7o)", value: tags, onChange: (e) => setTags(e.target.value) })), /* @__PURE__ */ React.createElement(GoldButton, { className: "mt-3", onClick: add, icon: Upload }, "Adicionar")), /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-2 mb-4" }, /* @__PURE__ */ React.createElement(Search, { size: 15, color: "#8A8377" }), /* @__PURE__ */ React.createElement(TextInput, { placeholder: "Pesquisar imagens por nome ou tag...", value: q, onChange: (e) => setQ(e.target.value) })), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3" }, filtered.map((i) => /* @__PURE__ */ React.createElement("div", { key: i.id, className: "relative group" }, /* @__PURE__ */ React.createElement("img", { src: i.url, className: "w-full aspect-square object-cover" }), /* @__PURE__ */ React.createElement("button", { onClick: () => remove(i.id), className: "absolute top-1 right-1 w-5 h-5 rounded-full items-center justify-center hidden group-hover:flex", style: { background: COLORS.red } }, /* @__PURE__ */ React.createElement(Trash2, { size: 11, color: "#fff" })), /* @__PURE__ */ React.createElement("p", { className: "mt-1 truncate", style: { color: "#8A8377", fontSize: "10px" } }, i.name)))));
+  }
+  function ImagePickerModal({ library, onPick, onClose }) {
+    const [q, setQ] = useState("");
+    const filtered = library.filter((i) => (i.name + " " + i.tags).toLowerCase().includes(q.toLowerCase()));
+    return /* @__PURE__ */ React.createElement(Modal, { title: "Escolher imagem da biblioteca", onClose, wide: true }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-2 mb-4" }, /* @__PURE__ */ React.createElement(Search, { size: 15, color: "#8A8377" }), /* @__PURE__ */ React.createElement(TextInput, { placeholder: "Pesquisar...", value: q, onChange: (e) => setQ(e.target.value) })), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-3 sm:grid-cols-4 gap-3 overflow-y-auto", style: { maxHeight: "50vh" } }, filtered.map((i) => /* @__PURE__ */ React.createElement("button", { key: i.id, onClick: () => onPick(i.url), className: "relative" }, /* @__PURE__ */ React.createElement("img", { src: i.url, className: "w-full aspect-square object-cover hover:opacity-80" })))));
+  }
+  function AdminSettings({ db, updateDb, toast }) {
+    const [form, setForm] = useState(db.settings);
+    function set(k, v) {
+      setForm((f) => ({ ...f, [k]: v }));
+    }
+    function save() {
+      updateDb((d) => ({ ...d, settings: form }));
+      toast("Configura\xE7\xF5es salvas");
+    }
+    function exportBackup() {
+      const blob = new Blob([JSON.stringify(db, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `clmodas-backup-${todayISO()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast("Backup baixado");
+    }
+    function importBackup(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const parsed = JSON.parse(ev.target.result);
+          if (!parsed || !parsed.products || !parsed.settings) throw new Error("formato inv\xE1lido");
+          updateDb(() => parsed);
+          toast("Backup importado com sucesso");
+        } catch (err) {
+          toast("N\xE3o consegui ler esse arquivo de backup", "error");
+        }
+      };
+      reader.readAsText(file);
+      e.target.value = "";
+    }
+    return /* @__PURE__ */ React.createElement("div", { className: "max-w-lg" }, /* @__PURE__ */ React.createElement("h1", { style: { fontFamily: "'Fraunces', serif", fontSize: 24, color: COLORS.creamSoft } }, "Configura\xE7\xF5es da loja"), /* @__PURE__ */ React.createElement("div", { className: "mt-6" }, /* @__PURE__ */ React.createElement(Field, { label: "Nome da loja" }, /* @__PURE__ */ React.createElement(TextInput, { value: form.storeName, onChange: (e) => set("storeName", e.target.value) })), /* @__PURE__ */ React.createElement(Field, { label: "Frase de destaque (banner principal)" }, /* @__PURE__ */ React.createElement(TextInput, { value: form.tagline, onChange: (e) => set("tagline", e.target.value) })), /* @__PURE__ */ React.createElement(Field, { label: "WhatsApp (somente n\xFAmeros, com DDI 55)" }, /* @__PURE__ */ React.createElement(TextInput, { value: form.whatsapp, onChange: (e) => set("whatsapp", e.target.value.replace(/\D/g, "")) })), /* @__PURE__ */ React.createElement(Field, { label: "WhatsApp (como aparece no site)" }, /* @__PURE__ */ React.createElement(TextInput, { value: form.whatsappDisplay, onChange: (e) => set("whatsappDisplay", e.target.value) })), /* @__PURE__ */ React.createElement(Field, { label: "Instagram" }, /* @__PURE__ */ React.createElement(TextInput, { value: form.instagram, onChange: (e) => set("instagram", e.target.value) })), /* @__PURE__ */ React.createElement(Field, { label: "Endere\xE7o" }, /* @__PURE__ */ React.createElement(TextInput, { value: form.address, onChange: (e) => set("address", e.target.value) })), /* @__PURE__ */ React.createElement(Field, { label: "Texto de frete gr\xE1tis" }, /* @__PURE__ */ React.createElement(TextInput, { value: form.freeShippingText, onChange: (e) => set("freeShippingText", e.target.value) })), /* @__PURE__ */ React.createElement(GoldButton, { onClick: save }, "Salvar configura\xE7\xF5es")), /* @__PURE__ */ React.createElement("div", { className: "mt-10 pt-6", style: { borderTop: `1px solid ${COLORS.line}` } }, /* @__PURE__ */ React.createElement("p", { className: "text-sm mb-1", style: { color: COLORS.creamSoft } }, "Backup dos dados"), /* @__PURE__ */ React.createElement("p", { className: "text-xs mb-3", style: { color: "#8A8377" } }, "Depois de cadastrar produtos e fotos, baixe um backup. Se os dados sumirem do navegador por qualquer motivo, \xE9 s\xF3 importar esse arquivo de volta que tudo retorna do jeito que estava."), /* @__PURE__ */ React.createElement("div", { className: "flex flex-wrap gap-2" }, /* @__PURE__ */ React.createElement(GoldButton, { type: "outline", onClick: exportBackup }, "Exportar backup"), /* @__PURE__ */ React.createElement("label", { className: "flex items-center gap-2 px-5 py-2.5 text-sm cursor-pointer", style: { border: `1px solid ${COLORS.line}`, color: COLORS.creamSoft } }, /* @__PURE__ */ React.createElement(Upload, { size: 15 }), " Importar backup", /* @__PURE__ */ React.createElement("input", { type: "file", accept: "application/json", onChange: importBackup, style: { display: "none" } })))));
+  }
+  function AdminSite({ db, updateDb, onExit, toast }) {
+    const [authed, setAuthed] = useState(false);
+    const [page, setPage] = useState("dashboard");
+    const [picker, setPicker] = useState(null);
+    function openImagePicker(onSelect) {
+      setPicker({ onSelect });
+    }
+    if (!authed) return /* @__PURE__ */ React.createElement(AdminLogin, { onLogin: () => setAuthed(true) });
+    return /* @__PURE__ */ React.createElement(AdminShell, { page, setPage, onExit, onLogout: () => setAuthed(false) }, page === "dashboard" && /* @__PURE__ */ React.createElement(AdminDashboard, { db }), page === "products" && /* @__PURE__ */ React.createElement(AdminProducts, { db, updateDb, openImagePicker, toast }), page === "categories" && /* @__PURE__ */ React.createElement(
+      SimpleCrud,
+      {
+        title: "Categorias",
+        items: db.categories,
+        fields: [{ key: "name", label: "Nome", type: "text" }, { key: "slug", label: "Slug", type: "text" }, { key: "image", label: "Imagem", type: "image" }],
+        columns: [{ key: "image", label: "", render: (c) => /* @__PURE__ */ React.createElement("img", { src: c.image, className: "w-10 h-10 object-cover" }) }, { key: "name", label: "Nome" }, { key: "slug", label: "Slug" }],
+        onAdd: (c) => updateDb((d) => ({ ...d, categories: [...d.categories, c] })),
+        onEdit: (c) => updateDb((d) => ({ ...d, categories: d.categories.map((x) => x.id === c.id ? c : x) })),
+        onDelete: (id) => updateDb((d) => ({ ...d, categories: d.categories.filter((x) => x.id !== id) })),
+        openImagePicker
+      }
+    ), page === "banners" && /* @__PURE__ */ React.createElement(
+      SimpleCrud,
+      {
+        title: "Banners",
+        items: db.banners,
+        fields: [{ key: "title", label: "T\xEDtulo", type: "text" }, { key: "subtitle", label: "Subt\xEDtulo", type: "text" }, { key: "buttonText", label: "Texto do bot\xE3o", type: "text" }, { key: "image", label: "Imagem", type: "image" }, { key: "active", label: "Status", type: "checkbox", checkLabel: "Ativo" }],
+        columns: [{ key: "image", label: "", render: (b) => /* @__PURE__ */ React.createElement("img", { src: b.image, className: "w-14 h-9 object-cover" }) }, { key: "title", label: "T\xEDtulo" }, { key: "active", label: "Status", render: (b) => b.active ? /* @__PURE__ */ React.createElement("span", { style: { color: COLORS.green } }, "Ativo") : /* @__PURE__ */ React.createElement("span", { style: { color: "#8A8377" } }, "Inativo") }],
+        onAdd: (b) => updateDb((d) => ({ ...d, banners: [...d.banners, b] })),
+        onEdit: (b) => updateDb((d) => ({ ...d, banners: d.banners.map((x) => x.id === b.id ? b : x) })),
+        onDelete: (id) => updateDb((d) => ({ ...d, banners: d.banners.filter((x) => x.id !== id) })),
+        openImagePicker
+      }
+    ), page === "orders" && /* @__PURE__ */ React.createElement(AdminOrders, { db, updateDb }), page === "clients" && /* @__PURE__ */ React.createElement(AdminClients, { db }), page === "coupons" && /* @__PURE__ */ React.createElement(
+      SimpleCrud,
+      {
+        title: "Cupons",
+        items: db.coupons,
+        fields: [{ key: "code", label: "C\xF3digo", type: "text" }, { key: "percent", label: "Desconto (%)", type: "number" }, { key: "active", label: "Status", type: "checkbox", checkLabel: "Ativo" }],
+        columns: [{ key: "code", label: "C\xF3digo" }, { key: "percent", label: "Desconto", render: (c) => `${c.percent}%` }, { key: "active", label: "Status", render: (c) => c.active ? /* @__PURE__ */ React.createElement("span", { style: { color: COLORS.green } }, "Ativo") : /* @__PURE__ */ React.createElement("span", { style: { color: "#8A8377" } }, "Inativo") }],
+        onAdd: (c) => updateDb((d) => ({ ...d, coupons: [...d.coupons, c] })),
+        onEdit: (c) => updateDb((d) => ({ ...d, coupons: d.coupons.map((x) => x.id === c.id ? c : x) })),
+        onDelete: (id) => updateDb((d) => ({ ...d, coupons: d.coupons.filter((x) => x.id !== id) })),
+        openImagePicker
+      }
+    ), page === "library" && /* @__PURE__ */ React.createElement(AdminLibrary, { db, updateDb, toast }), page === "settings" && /* @__PURE__ */ React.createElement(AdminSettings, { db, updateDb, toast }), picker && /* @__PURE__ */ React.createElement(ImagePickerModal, { library: db.imageLibrary, onClose: () => setPicker(null), onPick: (url) => {
+      picker.onSelect(url);
+      setPicker(null);
+    } }));
+  }
+  function App() {
+    const [db, setDb] = useState(null);
+    const [cart, setCart] = useState([]);
+    const [favorites, setFavorites] = useState([]);
+    const [mode, setMode] = useState("public");
+    const [toastState, setToastState] = useState(null);
+    useEffect(() => {
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Manrope:wght@400;500;600;700;800&display=swap";
+      document.head.appendChild(link);
+      const style = document.createElement("style");
+      style.textContent = `
+      @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+      @keyframes slideRight { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+      @keyframes modalIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+      @keyframes toastIn { from { opacity: 0; transform: translate(-50%, 10px); } to { opacity: 1; transform: translate(-50%, 0); } }
+      .animate-fadeIn { animation: fadeIn 0.35s ease; }
+      .animate-slideRight { animation: slideRight 0.25s ease; }
+      .animate-modalIn { animation: modalIn 0.2s ease; }
+      .animate-toastIn { animation: toastIn 0.25s ease; }
+      * { box-sizing: border-box; }
+      button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, a:focus-visible { outline: 2px solid ${COLORS.gold}; outline-offset: 2px; }
+      @media (prefers-reduced-motion: reduce) { .animate-fadeIn, .animate-slideRight, .animate-modalIn, .animate-toastIn { animation: none !important; } }
+      input[type="range"] { accent-color: ${COLORS.gold}; }
+    `;
+      document.head.appendChild(style);
+      return () => {
+        document.head.removeChild(link);
+        document.head.removeChild(style);
+      };
+    }, []);
+    useEffect(() => {
+      loadAll();
+    }, []);
+    useEffect(() => {
+      function handleKey(e) {
+        if (e.ctrlKey && e.altKey && (e.key === "a" || e.key === "A")) setMode("admin");
+      }
+      window.addEventListener("keydown", handleKey);
+      return () => window.removeEventListener("keydown", handleKey);
+    }, []);
+    async function loadAll() {
+      try {
+        const res = await window.storage.get("clmodas-db", true);
+        if (res && res.value) setDb(JSON.parse(res.value));
+        else {
+          const seeded = seedDB();
+          setDb(seeded);
+          try {
+            await window.storage.set("clmodas-db", JSON.stringify(seeded), true);
+          } catch (e) {
+          }
+        }
+      } catch (e) {
+        setDb(seedDB());
+      }
+      try {
+        const c = await window.storage.get("clmodas-cart", false);
+        if (c && c.value) setCart(JSON.parse(c.value));
+      } catch (e) {
+      }
+      try {
+        const f = await window.storage.get("clmodas-fav", false);
+        if (f && f.value) setFavorites(JSON.parse(f.value));
+      } catch (e) {
+      }
+    }
+    function updateDb(mutator) {
+      setDb((prev) => {
+        const next = mutator(prev);
+        window.storage.set("clmodas-db", JSON.stringify(next), true).catch(() => {
+        });
+        return next;
+      });
+    }
+    function persistCart(next) {
+      setCart(next);
+      window.storage.set("clmodas-cart", JSON.stringify(next), false).catch(() => {
+      });
+    }
+    function persistFav(next) {
+      setFavorites(next);
+      window.storage.set("clmodas-fav", JSON.stringify(next), false).catch(() => {
+      });
+    }
+    function toast(text, type) {
+      setToastState({ text, type: type || "success" });
+      setTimeout(() => setToastState(null), 2600);
+    }
+    function addToCart(product, size, color, qty) {
+      const stock = product.variantType === "simple" ? product.stock : getVariantStock(product, size, color);
+      if (stock <= 0) {
+        toast("Esta varia\xE7\xE3o est\xE1 esgotada.", "error");
+        return;
+      }
+      setCart((prev) => {
+        const idx = prev.findIndex((i) => i.productId === product.id && i.size === size && i.color === color);
+        let next;
+        if (idx >= 0) {
+          next = [...prev];
+          next[idx] = { ...next[idx], qty: Math.min(stock, next[idx].qty + qty) };
+        } else next = [...prev, { productId: product.id, size, color, qty: Math.min(stock, qty) }];
+        persistCart(next);
+        return next;
+      });
+    }
+    function updateCartQty(idx, qty) {
+      setCart((prev) => {
+        const next = [...prev];
+        next[idx] = { ...next[idx], qty };
+        persistCart(next);
+        return next;
+      });
+    }
+    function removeFromCart(idx) {
+      setCart((prev) => {
+        const next = prev.filter((_, i) => i !== idx);
+        persistCart(next);
+        return next;
+      });
+    }
+    function toggleFavorite(productId) {
+      setFavorites((prev) => {
+        const next = prev.includes(productId) ? prev.filter((id) => id !== productId) : [...prev, productId];
+        persistFav(next);
+        return next;
+      });
+    }
+    function checkout(data, clearAfter) {
+      const { items, subtotal, discount, total, name, phone } = data;
+      updateDb((d) => {
+        const nextSeq = (d.orderSeq || 1249) + 1;
+        const order = { id: String(nextSeq), customerName: name || "Cliente site", phone: phone || db.settings.whatsapp, items, total, date: todayISO(), status: "Novo" };
+        return { ...d, orders: [...d.orders, order], orderSeq: nextSeq };
+      });
+      const msg = buildOrderMessage(db.settings.storeName, items, subtotal, discount, total, name);
+      window.open(waLink(db.settings.whatsapp, msg), "_blank");
+      if (clearAfter) persistCart([]);
+    }
+    if (!db) {
+      return /* @__PURE__ */ React.createElement("div", { className: "min-h-screen flex items-center justify-center", style: { background: COLORS.ink, color: COLORS.gold, fontFamily: "'Fraunces', serif" } }, "Carregando CL MODAS...");
+    }
+    return /* @__PURE__ */ React.createElement("div", null, mode === "public" ? /* @__PURE__ */ React.createElement(
+      PublicSite,
+      {
+        db,
+        cart,
+        favorites,
+        addToCart,
+        updateCartQty,
+        removeFromCart,
+        toggleFavorite,
+        checkout,
+        openAdmin: () => setMode("admin"),
+        toast
+      }
+    ) : /* @__PURE__ */ React.createElement(AdminSite, { db, updateDb, onExit: () => setMode("public"), toast }), /* @__PURE__ */ React.createElement(Toast, { toast: toastState }));
+  }
+  ReactDOM.createRoot(document.getElementById("root")).render(/* @__PURE__ */ React.createElement(App, null));
+})();
+
+</script>
+</body>
+</html>
